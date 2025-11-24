@@ -1,0 +1,9 @@
+calculator/
+converter/
+downloader/
+generator/
+main/
+saesal/
+.DS_Store
+node_modules/
+*.pem

@@ -1,0 +1,291 @@
+🧪 DEPLOYING TO DEVELOPMENT (dev) 🧪
+============================================
+🚀 Deploying calculator to dev environment
+============================================
+Local Dir: calculator
+Remote Dir: /home/ubuntu/hqmx/services/calculator/releases/20251123_235528
+Target Link: /home/ubuntu/hqmx/services/calculator/dev
+--------------------------------------------
+📂 Creating remote directories...
+📦 Uploading files to new release folder...
+Transfer starting: 188 files
+./
+.gitignore
+101.md
+ARCHITECTURE.md
+CATEGORY.md
+GEMINI.md
+TEMPLATE_STRUCTURE_ANALYSIS.md
+hqmx-ec2.pem
+.gemini/
+.gemini/tmp/
+.gemini/tmp/calculator.hqmx.net
+.gemini/tmp/calculator.hqmx.net.nginx
+.gemini/tmp/default.nginx_cleaned
+.gemini/tmp/default.nginx_no_default_server
+.gemini/tmp/get_html.js
+.gemini/tmp/get_html_ip.js
+.gemini/tmp/screenshot.png
+.gemini/tmp/verify_site.js
+.gemini/tmp/cda1dbb823fe9d320ed99e4e499b32b39a9af68cbca746239a97bcb02addde63/
+.gemini/tmp/cda1dbb823fe9d320ed99e4e499b32b39a9af68cbca746239a97bcb02addde63/playwright_test.js
+frontend/
+frontend/ads.txt
+frontend/bmi_after_fix.png
+frontend/category.css
+frontend/category.js
+frontend/feature-flags.js
+frontend/final_screenshot.png
+frontend/fix_html_structure.py
+frontend/i18n.js
+frontend/index.html
+frontend/index.html.backup
+frontend/manifest.json
+frontend/nav-common.js
+frontend/rebuild_all_html.py
+frontend/robots.txt
+frontend/script.js
+frontend/style.css
+frontend/sw.js
+frontend/test_dark.png
+frontend/test_light.png
+frontend/test_screenshot.png
+frontend/test_screenshot_mobile.png
+frontend/test_v2.png
+frontend/assets/
+frontend/assets/apple-touch-icon.png
+frontend/assets/bg.webp
+frontend/assets/bg_100 (1).webp
+frontend/assets/bgdk.webp
+frontend/assets/bgdk_100 (1).webp
+frontend/assets/dkmbg.webp
+frontend/assets/dkmbg_100 (1).webp
+frontend/assets/favicon-96x96.png
+frontend/assets/favicon.ico
+frontend/assets/favicon.svg
+frontend/assets/mbg.webp
+frontend/assets/mbg_100 (1).webp
+frontend/assets/web-app-manifest-192x192.png
+frontend/assets/web-app-manifest-512x512.png
+frontend/assets/x-logo-black.svg
+frontend/assets/x-logo-white.svg
+frontend/assets/x-twitter-footer.svg
+frontend/construction/
+frontend/construction/concrete-calculator.html
+frontend/construction/paint-calculator.html
+frontend/construction/tile-calculator.html
+frontend/construction/wallpaper-calculator.html
+frontend/conversion/
+frontend/conversion/GEMINI.md
+frontend/conversion/area-converter.html
+frontend/conversion/area-converter.html.tmp
+frontend/conversion/length-converter.html
+frontend/conversion/length-converter.html.tmp
+frontend/conversion/temperature-converter-fixed.html
+frontend/conversion/temperature-converter-fixed.html.tmp
+frontend/conversion/temperature-converter-v2.html
+frontend/conversion/temperature-converter-v2.html.tmp
+frontend/conversion/temperature-converter.html
+frontend/conversion/temperature-converter.html.tmp
+frontend/conversion/volume-converter.html
+frontend/conversion/volume-converter.html.tmp
+frontend/conversion/weight-converter.html
+frontend/conversion/weight-converter.html.tmp
+frontend/css/
+frontend/css/calculator.css
+frontend/css/main.css
+frontend/date-time/
+frontend/date-time/GEMINI.md
+frontend/date-time/age-calculator.html
+frontend/date-time/date-calculator.html
+frontend/date-time/date-calculator.html.tmp
+frontend/date-time/time-calculator.html
+frontend/date-time/work-hours-calculator.html
+frontend/finance/
+frontend/finance/GEMINI.md
+frontend/finance/currency-converter.html
+frontend/finance/interest-calculator.html
+frontend/finance/loan-calculator.html
+frontend/finance/mortgage-calculator.html
+frontend/finance/roi-calculator.html
+frontend/finance/salary-calculator.html
+frontend/finance/tax-calculator.html
+frontend/finance/tax-calculator.html.tmp
+frontend/finance/tip-calculator.html
+frontend/general/
+frontend/general/GEMINI.md
+frontend/general/basic-calculator.html
+frontend/general/fraction-calculator.html
+frontend/general/percentage-calculator.html
+frontend/general/scientific-calculator.html
+frontend/health/
+frontend/health/GEMINI.md
+frontend/health/bmi-calculator-old.html
+frontend/health/bmi-calculator-old.html.tmp
+frontend/health/bmi-calculator-old2.html
+frontend/health/bmi-calculator-old2.html.tmp
+frontend/health/bmi-calculator-v3.html
+frontend/health/bmi-calculator.html
+frontend/health/bmi-calculator.html.backup
+frontend/health/calorie-calculator.html
+frontend/health/pregnancy-calculator.html
+frontend/health/protein-calculator.html
+frontend/health/weight-loss-calculator.html
+frontend/js/
+frontend/js/main.js
+frontend/js/calculators/
+frontend/js/calculators/age.js
+frontend/js/calculators/area.js
+frontend/js/calculators/aspect-ratio.js
+frontend/js/calculators/basic.js
+frontend/js/calculators/bmi.js
+frontend/js/calculators/calorie.js
+frontend/js/calculators/currency-converter.js
+frontend/js/calculators/date.js
+frontend/js/calculators/equation.js
+frontend/js/calculators/fraction.js
+frontend/js/calculators/length.js
+frontend/js/calculators/loan.js
+frontend/js/calculators/mortgage.js
+frontend/js/calculators/percentage.js
+frontend/js/calculators/pixel.js
+frontend/js/calculators/pregnancy.js
+frontend/js/calculators/protein.js
+frontend/js/calculators/salary.js
+frontend/js/calculators/scientific.js
+frontend/js/calculators/statistics.js
+frontend/js/calculators/tax.js
+frontend/js/calculators/temperature.js
+frontend/js/calculators/time.js
+frontend/js/calculators/tip.js
+frontend/js/calculators/video-bitrate.js
+frontend/js/calculators/volume.js
+frontend/js/calculators/weight-loss.js
+frontend/js/calculators/weight.js
+frontend/js/calculators/work-hours.js
+frontend/js/common/
+frontend/js/utils/
+frontend/js/utils/calculator-base.js
+frontend/js/utils/unit-converter.js
+frontend/locales/
+frontend/locales/ar.json
+frontend/locales/bn.json
+frontend/locales/de.json
+frontend/locales/en.json
+frontend/locales/es.json
+frontend/locales/fil.json
+frontend/locales/fr.json
+frontend/locales/hi.json
+frontend/locales/id.json
+frontend/locales/it.json
+frontend/locales/ja.json
+frontend/locales/ko.json
+frontend/locales/ms.json
+frontend/locales/my.json
+frontend/locales/pt.json
+frontend/locales/ru.json
+frontend/locales/th.json
+frontend/locales/tr.json
+frontend/locales/vi.json
+frontend/locales/zh-CN.json
+frontend/locales/zh-TW.json
+frontend/math/
+frontend/math/equation-solver.html
+frontend/math/probability-calculator.html
+frontend/math/statistics-calculator.html
+frontend/media/
+frontend/media/aspect-ratio-calculator.html
+frontend/media/pixel-calculator.html
+frontend/media/video-bitrate-calculator.html
+
+sent 7254926 bytes  received 3836 bytes  2386102 bytes/sec
+total size is 9054868  speedup is 1.25
+🔗 Linking shared resources...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+🔄 Switching 'dev' symlink...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+🧹 Cleaning up old releases...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+✅ Deployment Complete!
+Deployed to: /home/ubuntu/hqmx/services/calculator/dev

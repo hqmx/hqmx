@@ -1,0 +1,576 @@
+🧪 DEPLOYING TO DEVELOPMENT (dev) 🧪
+============================================
+🚀 Deploying downloader to dev environment
+============================================
+Local Dir: downloader/frontend
+Remote Dir: /home/ubuntu/hqmx/services/downloader/releases/20251123_235528
+Target Link: /home/ubuntu/hqmx/services/downloader/dev
+--------------------------------------------
+📂 Creating remote directories...
+📦 Uploading files to new release folder...
+Transfer starting: 473 files
+./
+CLAUDE.md
+api.html
+app.html
+app.png
+faq.html
+how-to-use.html
+i18n.js
+index.html
+naver4601873b708319d718d34dffe86c351b.html
+naver5701f470a1983ad80c0dede2be4c3c59.html
+pinterest_mock_response.json
+robots.txt
+script.js
+sitemap-naver.xml
+sitemap.html
+sitemap.xml
+style.css
+ar/
+ar/dailymotion/
+ar/dailymotion/index.html
+ar/facebook/
+ar/facebook/index.html
+ar/instagram/
+ar/instagram/index.html
+ar/pinterest/
+ar/pinterest/index.html
+ar/reddit/
+ar/reddit/index.html
+ar/soundcloud/
+ar/soundcloud/index.html
+ar/tiktok/
+ar/tiktok/index.html
+ar/tumblr/
+ar/tumblr/index.html
+ar/twitter/
+ar/twitter/index.html
+assets/
+assets/4k-icon.png
+assets/apple-touch-icon.png
+assets/audio-icon.png
+assets/batch-icon.png
+assets/bg.webp
+assets/bgdk.webp
+assets/dkmbg.webp
+assets/favicon-96x96.png
+assets/favicon.ico
+assets/favicon.svg
+assets/file-icon.png
+assets/free-icon.png
+assets/mbg.webp
+assets/media-icons.png
+assets/multi-media-icon.png
+assets/site.webmanifest
+assets/web-app-manifest-192x192.png
+assets/web-app-manifest-512x512.png
+assets/x-twitter-footer.svg
+assets/platform-logos/
+assets/platform-logos/dailymotion.svg
+assets/platform-logos/facebook.svg
+assets/platform-logos/instagram.svg
+assets/platform-logos/pinterest.svg
+assets/platform-logos/reddit.svg
+assets/platform-logos/soundcloud.svg
+assets/platform-logos/tiktok.svg
+assets/platform-logos/tumblr.svg
+assets/platform-logos/twitter.svg
+bn/
+bn/dailymotion/
+bn/dailymotion/index.html
+bn/facebook/
+bn/facebook/index.html
+bn/instagram/
+bn/instagram/index.html
+bn/pinterest/
+bn/pinterest/index.html
+bn/reddit/
+bn/reddit/index.html
+bn/soundcloud/
+bn/soundcloud/index.html
+bn/tiktok/
+bn/tiktok/index.html
+bn/tumblr/
+bn/tumblr/index.html
+bn/twitter/
+bn/twitter/index.html
+de/
+de/dailymotion/
+de/dailymotion/index.html
+de/facebook/
+de/facebook/index.html
+de/instagram/
+de/instagram/index.html
+de/pinterest/
+de/pinterest/index.html
+de/reddit/
+de/reddit/index.html
+de/soundcloud/
+de/soundcloud/index.html
+de/tiktok/
+de/tiktok/index.html
+de/tumblr/
+de/tumblr/index.html
+de/twitter/
+de/twitter/index.html
+download/
+download/HQMX-Downloader-1.0.0.dmg
+en/
+en/dailymotion/
+en/dailymotion/index.html
+en/facebook/
+en/facebook/index.html
+en/instagram/
+en/instagram/index.html
+en/pinterest/
+en/pinterest/index.html
+en/reddit/
+en/reddit/index.html
+en/soundcloud/
+en/soundcloud/index.html
+en/tiktok/
+en/tiktok/index.html
+en/tumblr/
+en/tumblr/index.html
+en/twitter/
+en/twitter/index.html
+es/
+es/dailymotion/
+es/dailymotion/index.html
+es/facebook/
+es/facebook/index.html
+es/instagram/
+es/instagram/index.html
+es/pinterest/
+es/pinterest/index.html
+es/reddit/
+es/reddit/index.html
+es/soundcloud/
+es/soundcloud/index.html
+es/tiktok/
+es/tiktok/index.html
+es/tumblr/
+es/tumblr/index.html
+es/twitter/
+es/twitter/index.html
+fil/
+fil/dailymotion/
+fil/dailymotion/index.html
+fil/facebook/
+fil/facebook/index.html
+fil/instagram/
+fil/instagram/index.html
+fil/pinterest/
+fil/pinterest/index.html
+fil/reddit/
+fil/reddit/index.html
+fil/soundcloud/
+fil/soundcloud/index.html
+fil/tiktok/
+fil/tiktok/index.html
+fil/tumblr/
+fil/tumblr/index.html
+fil/twitter/
+fil/twitter/index.html
+fr/
+fr/dailymotion/
+fr/dailymotion/index.html
+fr/facebook/
+fr/facebook/index.html
+fr/instagram/
+fr/instagram/index.html
+fr/pinterest/
+fr/pinterest/index.html
+fr/reddit/
+fr/reddit/index.html
+fr/soundcloud/
+fr/soundcloud/index.html
+fr/tiktok/
+fr/tiktok/index.html
+fr/tumblr/
+fr/tumblr/index.html
+fr/twitter/
+fr/twitter/index.html
+hi/
+hi/dailymotion/
+hi/dailymotion/index.html
+hi/facebook/
+hi/facebook/index.html
+hi/instagram/
+hi/instagram/index.html
+hi/pinterest/
+hi/pinterest/index.html
+hi/reddit/
+hi/reddit/index.html
+hi/soundcloud/
+hi/soundcloud/index.html
+hi/tiktok/
+hi/tiktok/index.html
+hi/tumblr/
+hi/tumblr/index.html
+hi/twitter/
+hi/twitter/index.html
+id/
+id/dailymotion/
+id/dailymotion/index.html
+id/facebook/
+id/facebook/index.html
+id/instagram/
+id/instagram/index.html
+id/pinterest/
+id/pinterest/index.html
+id/reddit/
+id/reddit/index.html
+id/soundcloud/
+id/soundcloud/index.html
+id/tiktok/
+id/tiktok/index.html
+id/tumblr/
+id/tumblr/index.html
+id/twitter/
+id/twitter/index.html
+it/
+it/dailymotion/
+it/dailymotion/index.html
+it/facebook/
+it/facebook/index.html
+it/instagram/
+it/instagram/index.html
+it/pinterest/
+it/pinterest/index.html
+it/reddit/
+it/reddit/index.html
+it/soundcloud/
+it/soundcloud/index.html
+it/tiktok/
+it/tiktok/index.html
+it/tumblr/
+it/tumblr/index.html
+it/twitter/
+it/twitter/index.html
+ja/
+ja/dailymotion/
+ja/dailymotion/index.html
+ja/facebook/
+ja/facebook/index.html
+ja/instagram/
+ja/instagram/index.html
+ja/pinterest/
+ja/pinterest/index.html
+ja/reddit/
+ja/reddit/index.html
+ja/soundcloud/
+ja/soundcloud/index.html
+ja/tiktok/
+ja/tiktok/index.html
+ja/tumblr/
+ja/tumblr/index.html
+ja/twitter/
+ja/twitter/index.html
+js/
+js/userProfileCollector.js
+ko/
+ko/dailymotion/
+ko/dailymotion/index.html
+ko/facebook/
+ko/facebook/index.html
+ko/instagram/
+ko/instagram/index.html
+ko/pinterest/
+ko/pinterest/index.html
+ko/reddit/
+ko/reddit/index.html
+ko/soundcloud/
+ko/soundcloud/index.html
+ko/tiktok/
+ko/tiktok/index.html
+ko/tumblr/
+ko/tumblr/index.html
+ko/twitter/
+ko/twitter/index.html
+locales/
+locales/ar.json
+locales/bn.json
+locales/de.json
+locales/en.json
+locales/es.json
+locales/fil.json
+locales/fr.json
+locales/hi.json
+locales/id.json
+locales/it.json
+locales/ja.json
+locales/ko.json
+locales/ms.json
+locales/my.json
+locales/pt.json
+locales/ru.json
+locales/th.json
+locales/tr.json
+locales/vi.json
+locales/zh-CN.json
+locales/zh-TW.json
+ms/
+ms/dailymotion/
+ms/dailymotion/index.html
+ms/facebook/
+ms/facebook/index.html
+ms/instagram/
+ms/instagram/index.html
+ms/pinterest/
+ms/pinterest/index.html
+ms/reddit/
+ms/reddit/index.html
+ms/soundcloud/
+ms/soundcloud/index.html
+ms/tiktok/
+ms/tiktok/index.html
+ms/tumblr/
+ms/tumblr/index.html
+ms/twitter/
+ms/twitter/index.html
+my/
+my/dailymotion/
+my/dailymotion/index.html
+my/facebook/
+my/facebook/index.html
+my/instagram/
+my/instagram/index.html
+my/pinterest/
+my/pinterest/index.html
+my/reddit/
+my/reddit/index.html
+my/soundcloud/
+my/soundcloud/index.html
+my/tiktok/
+my/tiktok/index.html
+my/tumblr/
+my/tumblr/index.html
+my/twitter/
+my/twitter/index.html
+pt/
+pt/dailymotion/
+pt/dailymotion/index.html
+pt/facebook/
+pt/facebook/index.html
+pt/instagram/
+pt/instagram/index.html
+pt/pinterest/
+pt/pinterest/index.html
+pt/reddit/
+pt/reddit/index.html
+pt/soundcloud/
+pt/soundcloud/index.html
+pt/tiktok/
+pt/tiktok/index.html
+pt/tumblr/
+pt/tumblr/index.html
+pt/twitter/
+pt/twitter/index.html
+ru/
+ru/dailymotion/
+ru/dailymotion/index.html
+ru/facebook/
+ru/facebook/index.html
+ru/instagram/
+ru/instagram/index.html
+ru/pinterest/
+ru/pinterest/index.html
+ru/reddit/
+ru/reddit/index.html
+ru/soundcloud/
+ru/soundcloud/index.html
+ru/tiktok/
+ru/tiktok/index.html
+ru/tumblr/
+ru/tumblr/index.html
+ru/twitter/
+ru/twitter/index.html
+th/
+th/dailymotion/
+th/dailymotion/index.html
+th/facebook/
+th/facebook/index.html
+th/instagram/
+th/instagram/index.html
+th/pinterest/
+th/pinterest/index.html
+th/reddit/
+th/reddit/index.html
+th/soundcloud/
+th/soundcloud/index.html
+th/tiktok/
+th/tiktok/index.html
+th/tumblr/
+th/tumblr/index.html
+th/twitter/
+th/twitter/index.html
+tr/
+tr/dailymotion/
+tr/dailymotion/index.html
+tr/facebook/
+tr/facebook/index.html
+tr/instagram/
+tr/instagram/index.html
+tr/pinterest/
+tr/pinterest/index.html
+tr/reddit/
+tr/reddit/index.html
+tr/soundcloud/
+tr/soundcloud/index.html
+tr/tiktok/
+tr/tiktok/index.html
+tr/tumblr/
+tr/tumblr/index.html
+tr/twitter/
+tr/twitter/index.html
+vi/
+vi/dailymotion/
+vi/dailymotion/index.html
+vi/facebook/
+vi/facebook/index.html
+vi/instagram/
+vi/instagram/index.html
+vi/pinterest/
+vi/pinterest/index.html
+vi/reddit/
+vi/reddit/index.html
+vi/soundcloud/
+vi/soundcloud/index.html
+vi/tiktok/
+vi/tiktok/index.html
+vi/tumblr/
+vi/tumblr/index.html
+vi/twitter/
+vi/twitter/index.html
+zh-CN/
+zh-CN/dailymotion/
+zh-CN/dailymotion/index.html
+zh-CN/facebook/
+zh-CN/facebook/index.html
+zh-CN/instagram/
+zh-CN/instagram/index.html
+zh-CN/pinterest/
+zh-CN/pinterest/index.html
+zh-CN/reddit/
+zh-CN/reddit/index.html
+zh-CN/soundcloud/
+zh-CN/soundcloud/index.html
+zh-CN/tiktok/
+zh-CN/tiktok/index.html
+zh-CN/tumblr/
+zh-CN/tumblr/index.html
+zh-CN/twitter/
+zh-CN/twitter/index.html
+zh-TW/
+zh-TW/dailymotion/
+zh-TW/dailymotion/index.html
+zh-TW/facebook/
+zh-TW/facebook/index.html
+zh-TW/instagram/
+zh-TW/instagram/index.html
+zh-TW/pinterest/
+zh-TW/pinterest/index.html
+zh-TW/reddit/
+zh-TW/reddit/index.html
+zh-TW/soundcloud/
+zh-TW/soundcloud/index.html
+zh-TW/tiktok/
+zh-TW/tiktok/index.html
+zh-TW/tumblr/
+zh-TW/tumblr/index.html
+zh-TW/twitter/
+zh-TW/twitter/index.html
+
+sent 190304761 bytes  received 6970 bytes  6022313 bytes/sec
+total size is 196050339  speedup is 1.03
+🔗 Linking shared resources...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+🔄 Switching 'dev' symlink...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+🧹 Cleaning up old releases...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+✅ Deployment Complete!
+Deployed to: /home/ubuntu/hqmx/services/downloader/dev

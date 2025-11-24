@@ -1,0 +1,302 @@
+🧪 DEPLOYING TO DEVELOPMENT (dev) 🧪
+============================================
+🚀 Deploying generator to dev environment
+============================================
+Local Dir: generator
+Remote Dir: /home/ubuntu/hqmx/services/generator/releases/20251123_235528
+Target Link: /home/ubuntu/hqmx/services/generator/dev
+--------------------------------------------
+📂 Creating remote directories...
+📦 Uploading files to new release folder...
+Transfer starting: 199 files
+./
+ARCHITECTURE.md
+GEMINI.md
+PROJECT_STRUCTURE.md
+cat
+hqmx-ec2.pem
+login.md
+minimal_server.py
+playwright_test.js
+qr-plan.md
+.vscode/
+.vscode/settings.json
+frontend/
+frontend/CATEGORY.md
+frontend/NO_LOGIN_STRATEGY.md
+frontend/QR_RENDERING_FIX_REPORT.md
+frontend/README.md
+frontend/TEST_RESULTS_SUMMARY.txt
+frontend/app.png
+frontend/debug-qr.js
+frontend/debug-step1-initial.png
+frontend/debug_qr.py
+frontend/debug_report.json
+frontend/i18n.js
+frontend/index.html
+frontend/investigate-qr.html
+frontend/package-lock.json
+frontend/package.json
+frontend/script.js
+frontend/style.css
+frontend/test-performance.html
+frontend/test-qr-preview.js
+frontend/test_dom_structure.py
+frontend/test_final_fix.py
+frontend/test_qr_drawing.py
+frontend/test_qr_manual.py
+frontend/test_qr_timing.py
+frontend/test_style_debug.py
+frontend/assets/
+frontend/assets/4k-icon.png
+frontend/assets/apple-touch-icon.png
+frontend/assets/bg.webp
+frontend/assets/bgdk.webp
+frontend/assets/dkmbg.webp
+frontend/assets/favicon-96x96.png
+frontend/assets/favicon.ico
+frontend/assets/favicon.svg
+frontend/assets/file-icon.png
+frontend/assets/free-icon.png
+frontend/assets/mbg.webp
+frontend/assets/media-icons.png
+frontend/assets/site.webmanifest
+frontend/assets/web-app-manifest-192x192.png
+frontend/assets/web-app-manifest-512x512.png
+frontend/assets/x-twitter-footer.svg
+frontend/assets/platform-logos/
+frontend/assets/platform-logos/dailymotion.svg
+frontend/assets/platform-logos/facebook.svg
+frontend/assets/platform-logos/instagram.svg
+frontend/assets/platform-logos/pinterest.svg
+frontend/assets/platform-logos/reddit.svg
+frontend/assets/platform-logos/soundcloud.svg
+frontend/assets/platform-logos/tiktok.svg
+frontend/assets/platform-logos/tumblr.svg
+frontend/assets/platform-logos/twitter.svg
+frontend/assets/qr-frames/
+frontend/assets/qr-frames/manifest.json
+frontend/assets/qr-frames/business/
+frontend/assets/qr-frames/business/brochure.svg
+frontend/assets/qr-frames/business/card.svg
+frontend/assets/qr-frames/business/flyer.svg
+frontend/assets/qr-frames/business/poster.svg
+frontend/assets/qr-frames/creative/
+frontend/assets/qr-frames/creative/abstract.svg
+frontend/assets/qr-frames/creative/art.svg
+frontend/assets/qr-frames/creative/geometric.svg
+frontend/assets/qr-frames/creative/pattern.svg
+frontend/assets/qr-frames/festive/
+frontend/assets/qr-frames/festive/birthday.svg
+frontend/assets/qr-frames/festive/celebration.svg
+frontend/assets/qr-frames/festive/christmas.svg
+frontend/assets/qr-frames/festive/halloween.svg
+frontend/assets/qr-frames/minimal/
+frontend/assets/qr-frames/minimal/elegant.svg
+frontend/assets/qr-frames/minimal/round.svg
+frontend/assets/qr-frames/minimal/shadow.svg
+frontend/assets/qr-frames/minimal/simple.svg
+frontend/assets/qr-frames/social/
+frontend/assets/qr-frames/social/facebook.svg
+frontend/assets/qr-frames/social/instagram.svg
+frontend/assets/qr-frames/social/tiktok.svg
+frontend/assets/qr-frames/social/youtube.svg
+frontend/css/
+frontend/css/calculator.css
+frontend/css/generator.css
+frontend/debug_screenshots/
+frontend/debug_screenshots/01_initial_load.png
+frontend/debug_screenshots/02_after_click.png
+frontend/debug_screenshots/03_after_char_1_t.png
+frontend/debug_screenshots/03_after_char_2_e.png
+frontend/debug_screenshots/03_after_char_3_s.png
+frontend/debug_screenshots/03_after_char_4_t.png
+frontend/debug_screenshots/03_after_char_5_1.png
+frontend/debug_screenshots/03_after_char_6_2.png
+frontend/debug_screenshots/03_after_char_7_3.png
+frontend/debug_screenshots/04_final_state.png
+frontend/debug_screenshots/dom_structure.png
+frontend/debug_screenshots/drag_test_01_before.png
+frontend/debug_screenshots/drag_test_02_after.png
+frontend/debug_screenshots/final_fix.png
+frontend/debug_screenshots/manual_test.png
+frontend/debug_screenshots/style_debug.png
+frontend/debug_screenshots/test_class_method.png
+frontend/debug_screenshots/test_drawing.png
+frontend/debug_screenshots/timing_test.png
+frontend/geminidocs/
+frontend/geminidocs/CATEGORY_SUMMARY.md
+frontend/geminidocs/QR-CODE-TEST-INDEX.md
+frontend/geminidocs/QR_CODE_FLOW_ANALYSIS.md
+frontend/geminidocs/QR_CODE_TEST_REPORT.md
+frontend/geminidocs/QR_TEST_SUMMARY.txt
+frontend/geminidocs/README_TEST_RESULTS.md
+frontend/geminidocs/TEST-EXECUTION-SUMMARY.md
+frontend/geminidocs/TEST_RESULTS_INDEX.md
+frontend/geminidocs/qr-code-advanced-design.md
+frontend/geminidocs/qr-code-screenshot-analysis.txt
+frontend/geminidocs/qr-code-test-report.md
+frontend/generators/
+frontend/generators/barcode.html
+frontend/generators/hash.html
+frontend/generators/lorem-ipsum.html
+frontend/generators/password.html
+frontend/generators/qr-code.html
+frontend/generators/uuid.html
+frontend/generators/locales/
+frontend/generators/locales/en.json
+frontend/js/
+frontend/js/main.js
+frontend/js/generators/
+frontend/js/generators/barcode.js
+frontend/js/generators/hash.js
+frontend/js/generators/lorem-ipsum.js
+frontend/js/generators/password.js
+frontend/js/generators/qr-code.js
+frontend/js/generators/uuid.js
+frontend/locales/
+frontend/locales/ar.json
+frontend/locales/bn.json
+frontend/locales/de.json
+frontend/locales/en.json
+frontend/locales/es.json
+frontend/locales/fil.json
+frontend/locales/fr.json
+frontend/locales/hi.json
+frontend/locales/id.json
+frontend/locales/it.json
+frontend/locales/ja.json
+frontend/locales/ko.json
+frontend/locales/ms.json
+frontend/locales/my.json
+frontend/locales/pt.json
+frontend/locales/ru.json
+frontend/locales/th.json
+frontend/locales/tr.json
+frontend/locales/vi.json
+frontend/locales/zh-CN.json
+frontend/locales/zh-TW.json
+frontend/test-results/
+frontend/test-results/.last-run.json
+frontend/test-results/tests-integrated_generator-5cd68-e-a-password-and-display-it/
+frontend/test-results/tests-integrated_generator-5cd68-e-a-password-and-display-it/error-context.md
+frontend/test-results/tests-integrated_generator-857b1-using-main-navigation-links/
+frontend/test-results/tests-integrated_generator-857b1-using-main-navigation-links/error-context.md
+frontend/test-results/tests-integrated_generator-babbb-e-a-QR-code-with-input-text/
+frontend/test-results/tests-integrated_generator-babbb-e-a-QR-code-with-input-text/error-context.md
+frontend/test-results/tests-integrated_generator-d6df5-Code-Generator-tab-and-back/
+frontend/test-results/tests-integrated_generator-d6df5-Code-Generator-tab-and-back/error-context.md
+frontend/test-results/tests-test-drag-preview-Pa-57ccd--dragging-the-preview-panel/
+frontend/test-results/tests-test-drag-preview-Pa-57ccd--dragging-the-preview-panel/error-context.md
+frontend/tests/
+frontend/tests/integrated_generators.spec.js
+frontend/tests/investigate-qr-rendering.spec.js
+frontend/tests/test-drag-preview.spec.js
+geminidocs/
+geminidocs/LAYOUT_VERIFICATION_SUMMARY.md
+geminidocs/README_LAYOUT_VERIFICATION.md
+geminidocs/SCREENSHOTS_AND_METRICS.txt
+geminidocs/generator_keyword_research_2024.md
+geminidocs/hqmx_generator_strategy_research.md
+geminidocs/layout-verification-report.md
+geminidocs/screenshot-desktop-1400px.png
+geminidocs/screenshot-main-section.png
+geminidocs/screenshot-tablet-768px.png
+geminidocs/screenshot-two-column.png
+research/
+research/executive-summary.md
+research/google-oauth-implementation-research.md
+test-results/
+test-results/.last-run.json
+
+sent 28563988 bytes  received 3934 bytes  3378779 bytes/sec
+total size is 30076186  speedup is 1.05
+🔗 Linking shared resources...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+🔄 Switching 'dev' symlink...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+🧹 Cleaning up old releases...
+Pseudo-terminal will not be allocated because stdin is not a terminal.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1016-aws x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Sun Nov 23 16:55:30 UTC 2025
+
+  System load:  0.41               Temperature:           -273.1 C
+  Usage of /:   32.1% of 32.86GB   Processes:             149
+  Memory usage: 16%                Users logged in:       1
+  Swap usage:   0%                 IPv4 address for ens5: 172.31.19.114
+
+ * Ubuntu Pro delivers the most comprehensive open source security and
+   compliance features.
+
+   https://ubuntu.com/aws/pro
+
+Expanded Security Maintenance for Applications is not enabled.
+
+38 updates can be applied immediately.
+To see these additional updates run: apt list --upgradable
+
+12 additional security updates can be applied with ESM Apps.
+Learn more about enabling ESM Apps service at https://ubuntu.com/esm
+
+
+✅ Deployment Complete!
+Deployed to: /home/ubuntu/hqmx/services/generator/dev
