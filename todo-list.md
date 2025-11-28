@@ -51,7 +51,9 @@
 - [ ] **Nginx 설정 적용 및 재시작**
 - [ ] **DNS 변경 실행**: 계획에 따라 DNS 레코드를 업데이트하여 트래픽을 EC2로 전환
 
+- [ ] **main/frontend/index.html 경로 오류 긴급 수정**
+
 ## Phase 5: 최종 정리 (Finalization)
 
 - [ ] **Cloudflare Pages 프로젝트 비활성화**: 모든 전환이 완료된 후 기존 Cloudflare Pages 프로젝트들을 아카이빙 또는 삭제
-- [x] **관련 문서 업데이트**: 모든 `GEMINI.md` 및 `README.md` 파일에서 Cloudflare Pages 관련 내용을 제거하고 새로운 배포 절차 안내
+- [ ] **관련 문서 업데이트**: 모든 `GEMINI.md` 및 `README.md` 파일에서 Cloudflare Pages 관련 내용을 제거하고 새로운 배포 절차 안내
