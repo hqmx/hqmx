@@ -31,7 +31,7 @@
 | **Backend** | Python Flask / Node.js Express | **AWS EC2 (t3.medium)** | 내부 API (파일 변환, 다운로드 등) |
 
 ### 리소스 계획
-*   **EC2**: `t3.medium` (2 vCPU, 4GB RAM) - **IP: 23.21.183.81**
+*   **EC2**: `t3.medium` (2 vCPU, 4GB RAM) - **IP: 23.21.183.81** [SSH Key](hqmx-ec2.pem)
 *   **EBS**: 80GB (OS + 모든 서비스 코드 + 라이브러리 + 임시 작업 공간)
 *   **DNS**: `hqmx.net` 도메인의 `A` 레코드가 EC2 IP `23.21.183.81`을 직접 가리킵니다. 기존 서브도메인 CNAME 레코드는 모두 제거됩니다.
 
@@ -124,3 +124,171 @@ server {
 *   **Cloudflare Pages 비활성화**: 전환이 안정화되면 기존의 Cloudflare Pages 프로젝트들을 비활성화 또는 삭제합니다.
 
 이로써 모든 서비스는 단일 EC2 인스턴스 위에서 통합 관리되며, 이는 아키텍처의 복잡성을 크게 낮추고 유지보수 효율성을 높일 것입니다.
+
+---
+
+## 5. 트러블슈팅 (Troubleshooting)
+
+### 🚨 [CRITICAL] 배포 실패 - 타임존 불일치 문제
+
+**발생 날짜**: 2025-11-29  
+**심각도**: CRITICAL (배포 완전 실패)
+
+#### 증상
+```
+ls: cannot access '/home/ubuntu/hqmx/services/main/current/': No such file or directory
+```
+- 배포는 성공했다고 나오지만 실제 서비스는 500 에러
+- `current` 심볼릭 링크가 존재하지 않는 디렉토리를 가리킴
+
+#### 근본 원인
+**타임존 불일치**로 인한 타임스탬프 불일치:
+- **로컬 환경**: Bangkok +07:00
+- **EC2 서버**: UTC (표준시)
+- **배포 스크립트**: 로컬 타임으로 `TIMESTAMP=$(date +%Y%m%d_%H%M%S)` 생성
+
+**결과**:
+```bash
+# 로컬에서 생성한 디렉토리명
+releases/20251129_005940  # 로컬 01:04 기준
+
+# 서버에 실제 존재하는 디렉토리
+releases/20251128_180000  # UTC 기준 (7시간 차이)
+
+# current 링크는 존재하지 않는 경로를 가리킴
+current -> releases/20251129_005940  ❌
+```
+
+#### 해결 방법
+**`scripts/deploy-modular.sh` 수정**:
+```bash
+# ❌ Before (로컬 타임 사용)
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# ✅ After (서버 타임 사용)
+# Generate timestamp on SERVER to avoid timezone issues
+TIMESTAMP=$(ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" "date +%Y%m%d_%H%M%S")
+```
+
+**서버 측 긴급 복구**:
+```bash
+ssh -i hqmx-ec2.pem ubuntu@23.21.183.81
+cd /home/ubuntu/hqmx/services/main
+LATEST=$(ls -t releases/ | head -1)
+ln -sfn /home/ubuntu/hqmx/services/main/releases/$LATEST current
+```
+
+**커밋**: `8818102` - "배포 스크립트 타임존 문제 수정"
+
+---
+
+### 🚨 [CRITICAL] 500 에러 - Nginx 무한 리다이렉션 루프
+
+**발생 날짜**: 2025-11-29  
+**심각도**: CRITICAL (메인 페이지, Downloader 접근 불가)
+
+#### 증상
+```
+[error] 48217#48217: *942 rewrite or internal redirection cycle while internally redirecting to "/index.html"
+```
+- **정상**: `/converter/`, `/generator/` (200 OK)
+- **500 에러**: `/`, `/downloader/`
+
+#### 근본 원인
+**Nginx location 블록 순서 및 try_files 설정 오류**:
+
+```nginx
+# ❌ 문제가 있던 설정
+location / {
+    try_files $uri $uri/ /index.html;  # 모든 경로에 적용됨!
+}
+
+# /api/converter/ 요청도 location /에 매칭
+# -> /index.html로 리다이렉션
+# -> 다시 location /에 매칭
+# -> 무한 루프 → 500 에러
+```
+
+#### 해결 방법
+**Nginx 설정 재구성** (`/etc/nginx/sites-available/hqmx.net`):
+
+1. **API 프록시를 먼저 배치** (우선순위 확보)
+2. **서브 경로 명시적 정의**
+3. **메인 페이지는 마지막에** 배치
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name hqmx.net www.hqmx.net;
+    
+    root /home/ubuntu/hqmx/services/main/current;
+    index index.html;
+
+    # ✅ 1. API 프록시 먼저 (^~ 사용으로 우선순위 확보)
+    location ^~ /api/converter/ {
+        proxy_pass http://localhost:3001/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ^~ /api/downloader/ {
+        proxy_pass http://localhost:5000/api/;
+        # ... (동일한 proxy headers)
+    }
+
+    # ✅ 2. 서브 경로 명시적 정의
+    location ^~ /converter/ {
+        alias /home/ubuntu/hqmx/services/converter/current/frontend/;
+        try_files $uri $uri/ /converter/index.html;
+    }
+
+    location ^~ /downloader/ {
+        alias /home/ubuntu/hqmx/services/downloader/current/;
+        try_files $uri $uri/ /downloader/index.html;
+    }
+
+    # ✅ 3. 메인 페이지는 마지막에 (fallback 없이)
+    location / {
+        try_files $uri $uri/ =404;  # /index.html 리다이렉션 제거
+    }
+}
+```
+
+**적용 명령**:
+```bash
+sudo mv /tmp/hqmx.net.nginx /etc/nginx/sites-available/hqmx.net
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+#### 검증 결과
+```bash
+$ curl -s -o /dev/null -w "%{http_code}\n" https://hqmx.net/
+200 ✅
+
+$ curl -s -o /dev/null -w "%{http_code}\n" https://hqmx.net/downloader/
+200 ✅
+```
+
+---
+
+### 📚 교훈 및 예방 조치
+
+1. **타임존**: 
+   - ✅ 서버 측에서 타임스탬프 생성 (완전 해결)
+   - 🔒 향후 모든 배포 스크립트에 동일 원칙 적용
+
+2. **Nginx 설정**:
+   - ✅ location 블록 순서 중요 (`^~` prefix로 우선순위 명확화)
+   - ✅ `try_files` 마지막 fallback은 신중하게 사용
+   - 🔒 설정 변경 시 항상 `nginx -t` 테스트
+
+3. **배포 검증**:
+   - 🔒 배포 후 반드시 HTTP 상태 코드 확인
+   - 🔒 Nginx 에러 로그 모니터링 필수: `tail -f /var/log/nginx/error.log`
+
+**참고 파일**:
+- Nginx 설정 백업: `nginx/hqmx.net.conf`
+- 배포 스크립트: `scripts/deploy-modular.sh`
