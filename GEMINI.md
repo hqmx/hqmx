@@ -295,135 +295,75 @@ $ curl -s -o /dev/null -w "%{http_code}\n" https://hqmx.net/downloader/
 
 ---
 
-### 🔄 [ONGOING] 네비게이션 표시 문제 (Converter, Calculator)
+### ✅ [RESOLVED] 네비게이션 링크 하드코딩 문제 (Converter, Calculator)
 
 **발생 날짜**: 2025-11-29  
-**심각도**: MEDIUM (기능은 작동하지만 UX 문제)  
-**상태**: 조사 중
+**해결 날짜**: 2025-11-29  
+**심각도**: MEDIUM (기능은 작동하지만 아키텍처 불일치)
 
-#### 사용자 보고 증상
-- Converter와 Calculator의 네비게이션이 "비정상"으로 표시됨
-- 정확한 증상 미확인 (브라우저 서브에이전트 오류로 직접 확인 불가)
+#### 원인 분석
 
-#### 서버 측 확인 결과 (2025-11-29 01:25 UTC+7)
+**Converter SEO 페이지들 (13,503개 파일)**:
+- 하드코딩된 서브도메인 링크 사용: `https://converter.hqmx.net/api.html`
+- SEO 다국어 페이지들의 상대 경로 오류: `/api.html`, `/how-to-use.html`
 
-**✅ Calculator** (`/calculator/`):
-```html
-<!-- 데스크톱 네비게이션 -->
-<a href="/calculator/" class="nav-link active">Home</a>
-<a href="/calculator/how-to-use.html" class="nav-link">How to Use</a>
-<a href="/calculator/faq.html" class="nav-link">FAQ</a>
-<a href="/calculator/api.html" class="nav-link">API</a>
-<a href="/calculator/sitemap.html" class="nav-link">Site Map</a>
+**Calculator 서브 페이지들 (40개 파일)**:
+- 서브디렉토리 접두사 누락: `/how-to-use.html` (올바른: `/calculator/how-to-use.html`)
+- 루트 링크 오류: `/` (올바른: `/calculator/`)
 
-<!-- 모바일 네비게이션 -->
-<a href="/calculator/" class="mobile-menu-link active">Home</a>
-<!-- ... 동일한 패턴 -->
+#### 해결 방법
+
+**Converter 수정** (`fix_converter_navigation.py`, `fix_converter_seo_links.py`):
+```python
+# 1단계: 하드코딩된 서브도메인 제거
+'https://converter.hqmx.net/api.html' → '/converter/api.html'  # 16개 파일
+
+# 2단계: SEO 다국어 페이지 경로 수정
+'/api.html' → '/converter/api.html'
+'/how-to-use.html' → '/converter/how-to-use.html'
+'/faq.html' → '/converter/faq.html'
+'/sitemap.html' → '/converter/sitemap.html'
+# 총 13,503개 파일 수정
 ```
-- ✅ 모든 링크가 `/calculator/` 접두사 사용
-- ✅ 서브디렉토리 구조에 맞게 정상
 
-**✅ Converter** (`/converter/`):
-```html
-<!-- 로고 링크 (메인 페이지로 이동) -->
-<a href="/" class="converter-logo-link">
-
-<!-- 데스크톱 네비게이션 -->
-<a href="/converter/" class="nav-link active">Convert</a>  <!-- ⚠️ href="#"이 아님 -->
-<a href="/converter/how-to-use.html" class="nav-link">How to Use</a>
-<!-- ... -->
+**Calculator 수정** (`fix_calculator_navigation.py`):
+```python
+# 모든 상대 링크에 서브디렉토리 접두사 추가
+'href="/"' → 'href="/calculator/"'
+'href="/how-to-use.html"' → 'href="/calculator/how-to-use.html"'
+'href="/faq"' → 'href="/calculator/faq.html"'
+'href="/api.html"' → 'href="/calculator/api.html"'
+'href="/sitemap"' → 'href="/calculator/sitemap.html"'
+# 총 40개 파일 수정
 ```
-- ✅ 모든 링크가 `/converter/` 접두사 사용
-- ✅ 로고는 `/` (메인 페이지로 이동, 정상)
 
-#### 가능한 원인 분석
+#### 배포 내역
 
-1. **브라우저 캐시 문제**
-   - 사용자 브라우저가 이전 버전의 HTML을 캐시하고 있을 가능성
-   - 서버 응답은 정상이지만 브라우저가 표시하는 내용이 다를 수 있음
-
-2. **JavaScript 동작 문제**
-   - 페이지 로드 후 JavaScript가 네비게이션을 동적으로 수정할 가능성
-   - `script.js`, `nav-common.js` 등의 스크립트 확인 필요
-
-3. **CSS 표시 문제**
-   - 링크는 올바르게 설정되었지만 스타일링 문제로 "비정상"으로 보일 가능성
-   - `active` 클래스가 올바르게 적용되지 않을 수 있음
-
-4. **특정 서브 페이지 문제**
-   - 메인 `index.html`은 정상이지만 서브 페이지들이 문제일 가능성
-   - 예: `/calculator/sitemap.html`, `/converter/faq.html` 등
-
-#### 진단 절차 (Diagnostic Workflow)
-
-**Phase 1: 브라우저 캐시 확인**
+**Converter**:
 ```bash
-# 사용자측 조치
-1. Hard Refresh (Cmd+Shift+R 또는 Ctrl+Shift+R)
-2. 시크릿 모드/프라이빗 브라우징으로 테스트
-3. 브라우저 캐시 완전 삭제
+커밋: 216c529
+배포: ./scripts/deploy-modular.sh --service=converter --env=prod
+상태: ✅ 완료 (2025-11-29 18:33 UTC)
 ```
 
-**Phase 2: 서버 헤더 확인**
+**Calculator**:
 ```bash
-# 캐시 헤더 확인
-curl -I https://hqmx.net/calculator/
-curl -I https://hqmx.net/converter/
-
-# 예상 헤더
-Cache-Control: public, immutable
-Expires: [1년 후]
+커밋: 34a9863
+배포: ./scripts/deploy-modular.sh --service=calculator --env=prod
+상태: ✅ 완료 (2025-11-29 18:34 UTC)
 ```
 
-**Phase 3: JavaScript 동작 확인**
-```bash
-# 서버에서 JavaScript 파일 확인
-ssh ubuntu@23.21.183.81
-cd /home/ubuntu/hqmx/services/calculator/current/
-grep -n "nav-link" frontend/*.js
-grep -n "active" frontend/*.js
-```
+#### 검증 결과
 
-**Phase 4: 서브 페이지 확인**
-```bash
-# 각 서브 페이지의 네비게이션 확인
-curl -s https://hqmx.net/calculator/sitemap.html | grep 'nav-link'
-curl -s https://hqmx.net/converter/faq.html | grep 'nav-link'
-```
+모든 네비게이션 링크가 단일 EC2 서브디렉토리 구조(`/converter/`, `/calculator/`)에 맞게 수정됨:
 
-#### 임시 해결 방안
+**수정된 파일 수**:
+- Converter: 13,519개 (메인 파일 16개 + SEO 페이지 13,503개)
+- Calculator: 40개
 
-1. **캐시 버스팅 강화**
-   ```nginx
-   # Nginx 설정에 추가
-   location ~* \.html$ {
-       add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
-   }
-   ```
+**참고 스크립트**:
+- `fix_converter_navigation.py`
+- `fix_converter_seo_links.py`
+- `fix_calculator_navigation.py`
 
-2. **버전 쿼리 파라미터 추가**
-   ```html
-   <link rel="stylesheet" href="/calculator/style.css?v=20251129">
-   <script src="/calculator/script.js?v=20251129"></script>
-   ```
-
-#### 다음 단계 (Next Actions)
-
-1. ✅ **사용자에게 구체적 증상 확인 요청**
-   - 어떤 페이지에서 문제 발생?
-   - 어떤 부분이 "비정상"으로 보이는지?
-   - 스크린샷 또는 브라우저 개발자 도구 콘솔 로그 공유
-
-2. ⏳ **브라우저 캐시 삭제 후 재확인**
-
-3. ⏳ **JavaScript 코드 분석**
-   - `nav-common.js` 검토
-   - 동적 클래스 추가/제거 로직 확인
-
-4. ⏳ **모든 서브 페이지 네비게이션 일괄 확인**
-
-**관련 파일**:
-- Calculator: `calculator/frontend/index.html`
-- Converter: `converter/frontend/index.html`
-- 공통 스타일: `*/frontend/style.css`
-- 공통 스크립트: `*/frontend/nav-common.js`
+---
