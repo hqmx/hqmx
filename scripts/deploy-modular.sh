@@ -72,7 +72,8 @@ case $SERVICE in
         ;;
 esac
 
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+# Generate timestamp on SERVER to avoid timezone issues
+TIMESTAMP=$(ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" "date +%Y%m%d_%H%M%S")
 RELEASE_DIR="$REMOTE_SERVICE_DIR/releases/$TIMESTAMP"
 
 # Determine Symlink Target based on Env
