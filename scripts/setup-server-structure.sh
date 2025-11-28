@@ -6,7 +6,7 @@
 set -e
 
 # Configuration
-EC2_HOST="52.55.219.204"
+EC2_HOST="23.21.183.81"
 EC2_USER="ubuntu"
 SSH_KEY="hqmx-ec2.pem"
 BASE_DIR="/home/ubuntu/hqmx"
