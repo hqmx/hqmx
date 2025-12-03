@@ -1,0 +1,75 @@
+server {
+    listen 80;
+    server_name hqmx.net www.hqmx.net;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name hqmx.net www.hqmx.net;
+
+    ssl_certificate /etc/letsencrypt/live/hqmx.net/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/hqmx.net/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Root maps to Main service (deployed via deploy-modular.sh)
+    root /home/ubuntu/hqmx/services/main/current;
+    index index.html;
+
+    # Main Page
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Handle /main/ prefix used in index.html assets
+    location ^~ /main/ {
+        alias /home/ubuntu/hqmx/services/main/current/;
+    }
+
+    # Converter
+    location ^~ /converter/ {
+        alias /home/ubuntu/hqmx/services/converter/current/;
+        try_files $uri $uri/ /converter/index.html;
+    }
+
+    # Downloader
+    location ^~ /downloader/ {
+        alias /home/ubuntu/hqmx/services/downloader/current/;
+        try_files $uri $uri.html $uri/ /downloader/index.html;
+    }
+
+    # Generator
+    location ^~ /generator/ {
+        alias /home/ubuntu/hqmx/services/generator/current/;
+        try_files $uri $uri.html $uri/ /generator/index.html;
+    }
+
+    # Calculator
+    location ^~ /calculator/ {
+        alias /home/ubuntu/hqmx/services/calculator/current/;
+        try_files $uri $uri.html $uri/ /calculator/index.html;
+    }
+
+    # API Proxy (Converter)
+    location /api/converter/ {
+        proxy_pass http://localhost:3001/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # API Proxy (Downloader)
+    location /api/downloader/ {
+        proxy_pass http://localhost:5000/api/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Common Assets Caching
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}

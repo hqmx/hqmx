@@ -8,8 +8,12 @@ set -e
 # Configuration
 EC2_HOST="23.21.183.81"
 EC2_USER="ubuntu"
-SSH_KEY="hqmx-ec2.pem"
 BASE_REMOTE_DIR="/home/ubuntu/hqmx/services"
+
+# Resolve Script Directory and Root Directory
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+SSH_KEY="$PROJECT_ROOT/hqmx-ec2.pem"
 
 # Parse Arguments
 SERVICE=""
@@ -48,22 +52,22 @@ case $SERVICE in
         ;;
     "downloader-backend")
         LOCAL_DIR="downloader/backend"
-        REMOTE_SERVICE_DIR="$BASE_REMOTE_DIR/downloader"
+        REMOTE_SERVICE_DIR="$BASE_REMOTE_DIR/downloader-backend"
         ;;
     "converter")
-        LOCAL_DIR="converter" 
+        LOCAL_DIR="converter/frontend" 
         REMOTE_SERVICE_DIR="$BASE_REMOTE_DIR/converter"
         ;;
     "converter-backend")
         LOCAL_DIR="converter/backend"
-        REMOTE_SERVICE_DIR="$BASE_REMOTE_DIR/converter"
+        REMOTE_SERVICE_DIR="$BASE_REMOTE_DIR/converter-backend"
         ;;
     "calculator")
-        LOCAL_DIR="calculator"
+        LOCAL_DIR="calculator/frontend"
         REMOTE_SERVICE_DIR="$BASE_REMOTE_DIR/calculator"
         ;;
     "generator")
-        LOCAL_DIR="generator"
+        LOCAL_DIR="generator/frontend"
         REMOTE_SERVICE_DIR="$BASE_REMOTE_DIR/generator"
         ;;
     *)
@@ -97,12 +101,9 @@ echo "--------------------------------------------"
 
 # 1. Check SSH Key
 if [ ! -f "$SSH_KEY" ]; then
-    if [ -f "../$SSH_KEY" ]; then
-        SSH_KEY="../$SSH_KEY"
-    else
-        echo "❌ Error: SSH key '$SSH_KEY' not found!"
-        exit 1
-    fi
+    echo "❌ Error: SSH key not found at: $SSH_KEY"
+    echo "Please ensure 'hqmx-ec2.pem' exists in the project root."
+    exit 1
 fi
 
 # 2. Create Remote Directories
@@ -121,6 +122,27 @@ else
     echo "⚠️ rsync not found, falling back to scp..."
     scp -i "$SSH_KEY" -r "$LOCAL_DIR/"* "$EC2_USER@$EC2_HOST:$RELEASE_DIR/"
 fi
+
+# Ensure the release directory has the latest timestamp to prevent accidental cleanup
+ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" "touch $RELEASE_DIR"
+
+# 3.5 Cache Busting (Update HTML references)
+echo "✨ Applying cache busting..."
+ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" << EOF
+    cd "$RELEASE_DIR"
+    # Find all HTML files and apply cache busting
+    find . -name "*.html" -type f | while read -r html_file; do
+        # Replace .css" and .js" with .css?v=TIMESTAMP" and .js?v=TIMESTAMP"
+        # Also handles existing query params like .css?v=old" -> .css?v=new"
+        # Use -E for extended regex to simplify syntax
+        # Use # as delimiter to avoid conflict with | (alternation) in regex
+        sed -E -i 's#\.(css|js)(\?v=[^"]*)?"#.\1?v='"$TIMESTAMP"'"#g' "\$html_file"
+    done
+    if [ -f "index.html" ]; then
+        # Ensure index.html is also processed (though find should catch it)
+        :
+    fi
+EOF
 
 # 4. Link Shared Resources
 echo "🔗 Linking shared resources..."
@@ -187,7 +209,7 @@ fi
 echo "🧹 Cleaning up old releases..."
 ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" << EOF
     cd "$REMOTE_SERVICE_DIR/releases"
-    ls -t | tail -n +6 | xargs -I {} rm -rf {}
+    ls -r | tail -n +6 | xargs -I {} rm -rf {}
 EOF
 
 echo "✅ Deployment Complete!"

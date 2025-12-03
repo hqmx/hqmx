@@ -1,0 +1,12 @@
+[submodule "calculator"]
+	path = calculator
+	url = https://github.com/hqmx/calculator.git
+[submodule "generator"]
+	path = generator
+	url = https://github.com/hqmx/generator.git
+[submodule "saesal"]
+	path = saesal
+	url = https://github.com/hqmx/saesal.git
+[submodule "hannah-design"]
+	path = hannah-design
+	url = https://github.com/hqmx/hannah-design.git

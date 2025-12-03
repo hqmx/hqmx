@@ -31,7 +31,8 @@
 | **Backend** | Python Flask / Node.js Express | **AWS EC2 (t3.medium)** | 내부 API (파일 변환, 다운로드 등) |
 
 ### 리소스 계획
-*   **EC2**: `t3.medium` (2 vCPU, 4GB RAM) - **IP: 23.21.183.81** [SSH Key](hqmx-ec2.pem)
+*   **EC2**: `t3.medium` (2 vCPU, 4GB RAM) - **IP: 23.21.183.81**
+    *   **SSH Key**: `hqmx-ec2.pem` (프로젝트 루트에 위치, 절대 경로 사용 금지, 하위 프로젝트 복사 금지)
 *   **EBS**: 80GB (OS + 모든 서비스 코드 + 라이브러리 + 임시 작업 공간)
 *   **DNS**: `hqmx.net` 도메인의 `A` 레코드가 EC2 IP `23.21.183.81`을 직접 가리킵니다. 기존 서브도메인 CNAME 레코드는 모두 제거됩니다.
 
@@ -95,9 +96,26 @@ server {
 
 모든 요청이 동일한 `hqmx.net` 도메인 하위에서 발생하므로 CORS 정책이 매우 단순해집니다. Nginx에서 `Access-Control-Allow-Origin 'https://hqmx.net'` 헤더만 설정하면 충분합니다.
 
-### C. 배포 프로세스 변경
+### 통합 배포 (EC2)
+모든 HQMX 서비스는 프로젝트 루트의 통합 배포 스크립트를 통해 단일 EC2 인스턴스에 배포됩니다.
 
-- 각 프로젝트(`converter`, `main` 등)의 프론트엔드 결과물(주로 `frontend` 폴더)을 EC2의 `/var/www/hqmx/{service_name}/` 디렉토리로 복사하는 새로운 통합 배포 스크립트가 필요합니다.
+```bash
+# Frontend Deployment
+./deploy.sh converter
+./deploy.sh downloader
+
+# Backend Deployment (Separate Directories)
+./deploy.sh converter-backend
+./deploy.sh downloader-backend
+```
+
+이 스크립트는 각 서비스의 `frontend` 또는 `backend` 디렉터리를 서버의 해당 위치(`/var/www/hqmx/service-name` 또는 `/var/www/hqmx/service-name-backend`)로 동기화합니다.
+**주의**: 프론트엔드와 백엔드는 서로 다른 디렉토리에 배포되므로 각각 별도로 배포해야 합니다.
+
+### C. 배포 프로세스 변경 (Standardized)
+
+- **표준화된 배포**: 모든 프론트엔드 서비스(`converter`, `downloader` 등)는 **`frontend` 디렉토리만** EC2의 `/var/www/hqmx/{service_name}/` (정확히는 `releases/timestamp`)로 배포됩니다.
+- **Nginx 설정**: 따라서 Nginx의 `alias`는 `.../current/frontend/`가 아닌 **`.../current/`** 를 가리켜야 합니다.
 - `git push`를 통한 자동 배포는 더 이상 사용되지 않으며, EC2에 직접 배포하는 방식으로 변경됩니다.
 
 ---
@@ -115,7 +133,15 @@ server {
 *   **API 엔드포인트 변경**: API 호출 주소를 `api.hqmx.net`에서 `/api/converter/` 와 같은 상대 경로로 수정합니다.
 
 ### 3단계: 배포 및 테스트
-*   **통합 배포**: 새로운 배포 스크립트를 사용하여 모든 프론트엔드 파일을 EC2에 배포합니다.
+*   **통합 배포 (권장)**: 새로운 모듈식 배포 스크립트를 사용하여 필요한 서비스만 빠르고 안전하게 배포합니다.
+    ```bash
+    # 사용법: ./deploy.sh <service_name>
+    ./deploy.sh main        # 메인 페이지 배포
+    ./deploy.sh converter   # Converter 서비스 배포
+    ./deploy.sh downloader  # Downloader 서비스 배포
+    ./deploy.sh generator   # Generator 서비스 배포
+    ./deploy.sh calculator  # Calculator 서비스 배포
+    ```
 *   **백엔드 재시작**: 백엔드 서비스(pm2, systemd)를 재시작하여 새로운 환경에서 정상 작동하는지 확인합니다.
 *   **종합 테스트**: `hqmx.net`에 접속하여 모든 서비스 페이지, 내부 링크, API 기능이 정상적으로 동작하는지 E2E 테스트를 수행합니다.
 
@@ -240,7 +266,7 @@ server {
 
     # ✅ 2. 서브 경로 명시적 정의
     location ^~ /converter/ {
-        alias /home/ubuntu/hqmx/services/converter/current/frontend/;
+        alias /home/ubuntu/hqmx/services/converter/current/;
         try_files $uri $uri/ /converter/index.html;
     }
 
@@ -285,13 +311,82 @@ $ curl -s -o /dev/null -w "%{http_code}\n" https://hqmx.net/downloader/
    - ✅ `try_files` 마지막 fallback은 신중하게 사용
    - 🔒 설정 변경 시 항상 `nginx -t` 테스트
 
-3. **배포 검증**:
+### 🚨 [CRITICAL] 배포 후 500 에러 - Cleanup 스크립트 오작동
+
+**발생 날짜**: 2025-11-29
+**심각도**: HIGH (배포 직후 파일 사라짐)
+
+#### 증상
+- 배포 스크립트는 성공했다고 나오지만, Nginx 로그에 `directory index of "..." is forbidden` 또는 `rewrite or internal redirection cycle` 에러 발생.
+- 서버에서 확인해보면 `current` 심볼릭 링크가 가리키는 디렉토리가 **삭제되어 없음**.
+
+#### 근본 원인
+- `rsync -a`는 원본 파일/디렉토리의 **수정 시간(mtime)**을 보존함.
+- 로컬의 `generator/frontend` 디렉토리가 오래전에 생성된 경우, 서버에 업로드된 후에도 오래된 날짜를 유지함.
+- 배포 스크립트의 **Cleanup 로직** (`ls -t | tail -n +6 | xargs rm -rf`)은 수정 시간 순으로 정렬하여 상위 5개만 남기고 삭제함.
+- 방금 업로드한 디렉토리가 날짜가 오래되어 "오래된 릴리스"로 인식되어 **즉시 삭제됨**.
+
+#### 해결 방법
+- `deploy-modular.sh`에서 `scp` 또는 `rsync` 업로드 직후, **`touch` 명령어로 타임스탬프를 갱신**하도록 수정.
+
+```bash
+# Ensure the release directory has the latest timestamp to prevent accidental cleanup
+ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" "touch $RELEASE_DIR"
+```
+
+**커밋**: `deploy-modular.sh` 수정됨.
+
+18. **배포 효율성**: `deploy-to-ec2.sh`는 모든 파일을 배포하므로, **변경된 (수정한) 파일만** 배포해야 할 경우 수동 배포를 활용하거나 꼭 필요한 경우에만 전체 배포 스크립트를 사용합니다 (캐시 버스팅은 필요에 따라 수동 적용).
+9. **캐시 버스팅 필수**: CSS, JS 등 수정이 잦은 정적 파일은 브라우저 캐시로 인해 변경사항이 즉시 반영되지 않을 수 있습니다. 배포 전 `index.html`에서 해당 파일의 쿼리 파라미터(예: `style.css?v=20251129_1830`)를 반드시 업데이트해야 합니다.
+10. **Backend .env 동기화**: 백엔드 `wrangler.toml` 또는 `package.json`의 `vars` 섹션이 변경되면, EC2 서버의 `/home/ubuntu/hqmx/backend/.env` 파일을 수동으로 업데이트해야 합니다. `pm2 restart hqmx-backend` 명령으로 변경 사항을 적용합니다. 이는 자동화된 배포 스크립트가 `.env` 파일을 직접 관리하지 않기 때문입니다.
+**배포 검증**:
    - 🔒 배포 후 반드시 HTTP 상태 코드 확인
    - 🔒 Nginx 에러 로그 모니터링 필수: `tail -f /var/log/nginx/error.log`
 
 **참고 파일**:
 - Nginx 설정 백업: `nginx/hqmx.net.conf`
 - 배포 스크립트: `scripts/deploy-modular.sh`
+
+---
+
+### ✅ [RESOLVED] Converter 서비스 경로 문제 (배경, SW, API)
+
+**발생 날짜**: 2025-11-29  
+**해결 날짜**: 2025-11-29  
+**심각도**: HIGH (UI 깨짐 및 기능 오류)
+
+#### 증상
+1.  **UI**: 배경 이미지가 로드되지 않고 흰색으로 표시됨.
+2.  **Console**: 
+    - `Service Worker registration failed: 404`
+    - `Tier mapping 로드 실패: SyntaxError` (JSON 대신 HTML 반환)
+    - `GET /api/queue-status 404`
+
+#### 원인 분석
+**서브디렉토리 구조(/converter/) 미반영**:
+- **CSS**: `url('assets/bg.webp')`는 상대 경로로 해석되어 `/converter/assets/`가 아닌 `/assets/`를 찾음 (또는 그 반대).
+- **SW**: `/sw.js`로 등록되어 루트 경로에서 찾음.
+- **API**: `/api/queue-status`로 호출하여 Nginx 라우팅 규칙(`/api/converter/`)과 불일치.
+- **JSON**: `converter/docs/` 폴더가 배포 대상인 `frontend` 폴더 밖에 있어 배포되지 않음.
+
+#### 해결 방법
+1.  **CSS 경로 수정**: `style.css`, `sitemap.css` 등에서 `url('/converter/assets/...')` 절대 경로로 수정.
+2.  **SW 등록 수정**: 모든 HTML 파일(13,000+개)에서 `navigator.serviceWorker.register('/converter/sw.js')`로 일괄 수정.
+3.  **API 경로 수정**: `batch-conversion-network-recovery.js`에서 `/api/converter/queue-status`로 수정.
+4.  **파일 이동**: `converter/docs/conversion-tier-mapping.json`을 `converter/frontend/docs/`로 복사하여 배포에 포함되도록 함.
+
+**커밋**: (자동 배포됨)
+
+---
+
+### 📚 교훈 및 예방 조치
+
+1.  **서브디렉토리 배포 시 경로 주의**:
+    - CSS `url()`은 항상 절대 경로(`/service-name/assets/...`) 사용 권장.
+    - JS `fetch()` 및 `Worker` 등록도 서비스 접두사 포함 필수.
+    
+2.  **배포 범위 확인**:
+    - `frontend` 폴더만 배포되므로, 필요한 리소스(JSON, 문서 등)는 반드시 그 안에 위치해야 함.
 
 ---
 
@@ -365,5 +460,38 @@ $ curl -s -o /dev/null -w "%{http_code}\n" https://hqmx.net/downloader/
 - `fix_converter_navigation.py`
 - `fix_converter_seo_links.py`
 - `fix_calculator_navigation.py`
+
+---
+### ✅ [RESOLVED] Deployment Path Fixes & Cache Busting
+
+**발생 날짜**: 2025-11-29
+**해결 날짜**: 2025-11-29
+**심각도**: HIGH (배포 직후 404/500 에러 및 캐시 문제)
+
+#### 증상
+1.  **배포 후 404/500 에러**: 배포 스크립트 실행 후 `current` 심볼릭 링크가 가리키는 디렉토리가 삭제되어 Nginx가 파일을 찾지 못함.
+2.  **캐시 문제**: CSS/JS 수정 사항이 브라우저 캐시로 인해 즉시 반영되지 않음.
+
+#### 원인 분석
+1.  **Cleanup 로직 오류**: `deploy-modular.sh`의 `ls -t` (시간순 정렬)가 `rsync`로 보존된 과거 타임스탬프 때문에 최신 릴리스를 "오래된 것"으로 오판하여 삭제함.
+2.  **캐시 버스팅 부재**: 정적 파일에 대한 버전 관리가 자동화되어 있지 않음.
+
+#### 해결 방법
+1.  **Cleanup 로직 수정**: `ls -t` 대신 **`ls -r` (역순 정렬)**을 사용하여 디렉토리 이름(타임스탬프) 기준으로 정렬하도록 수정. 이로써 파일시스템 타임스탬프와 무관하게 항상 최신 릴리스를 보존함.
+2.  **Cache Busting 구현**: `deploy-modular.sh`에 배포 단계 추가. `sed -E`를 사용하여 `index.html` 내의 `.css` 및 `.js` 참조에 `?v=TIMESTAMP` 쿼리 파라미터를 자동으로 추가/갱신함.
+
+```bash
+# scripts/deploy-modular.sh
+# Use -E for extended regex to simplify syntax
+# Use # as delimiter to avoid conflict with | (alternation) in regex
+sed -E -i 's#\.(css|js)(\?v=[^"]*)?"#.\1?v='""'"#g' index.html
+```
+
+#### 배포 및 검증
+- **Main**: `./deploy.sh main` -> 성공. `index.html`에서 `style.css?v=20251129_...` 확인.
+- **Downloader**: `./deploy.sh downloader` -> 성공.
+- **Nginx**: 404/500 에러 해결됨.
+
+**참고**: `deploy-modular.sh`
 
 ---

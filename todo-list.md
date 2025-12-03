@@ -45,15 +45,33 @@
 
 ## Phase 4: 배포 및 테스트 (Deployment & Testing)
 
-- [x] **통합 배po 스크립트 작성**: 모든 프로젝트의 `frontend` 빌드 결과물을 EC2의 통합 웹 루트 디렉토리로 배포하는 단일 쉘 스크립트 작성
+- [x] **통합 배포 스크립트 작성**: 모든 프로젝트의 `frontend` 빌드 결과물을 EC2의 통합 웹 루트 디렉토리로 배포하는 단일 쉘 스크립트 작성
 - [ ] **단계적 배포**: `main` 프로젝트부터 시작하여 하나씩 서비스를 새 구조로 배포
 - [ ] **E2E 테스트**: 모든 서비스가 새로운 URL 구조에서 정상적으로 작동하는지 종합적인 테스트 수행 (링크 클릭, API 호출, 리소스 로딩 등)
-- [ ] **Nginx 설정 적용 및 재시작**
-- [ ] **DNS 변경 실행**: 계획에 따라 DNS 레코드를 업데이트하여 트래픽을 EC2로 전환
-
-- [ ] **main/frontend/index.html 경로 오류 긴급 수정**
-
-## Phase 5: 최종 정리 (Finalization)
-
+- [x] **Fix Sub-Page Asset Paths**
+    - [x] Update `converter/frontend/index.html` (CSS, JS, manifest, favicon)
+    - [x] Update `downloader/frontend/index.html`
+    - [x] Update `generator/frontend/index.html`
+    - [x] Update `calculator/frontend/index.html`
+    - [x] Update `sitemap.html` for all services to use subdirectory links
+- [x] **Verify Converter and Downloader Functionality**
+    - [x] Check if `converter` loads correctly at `/converter/`
+    - [x] Check if `downloader` loads correctly at `/downloader/`
+    - [x] Verify internal links between services
 - [ ] **Cloudflare Pages 프로젝트 비활성화**: 모든 전환이 완료된 후 기존 Cloudflare Pages 프로젝트들을 아카이빙 또는 삭제
 - [ ] **관련 문서 업데이트**: 모든 `GEMINI.md` 및 `README.md` 파일에서 Cloudflare Pages 관련 내용을 제거하고 새로운 배포 절차 안내
+
+## Phase 5: Feature Expansion (Generator Tools)
+
+- [x] **Update Generator Navigation Logo**: Change to "GENERATOR" text logo
+- [x] **Generator Feature Expansion**
+    - [x] Create Barcode Generator (`barcode.html`, `barcode.js`)
+    - [x] Create UUID Generator (`uuid.html`, `uuid.js`)
+    - [x] Create Hash Generator (`hash.html`, `hash.js`)
+    - [x] Create Lorem Ipsum Generator (`lorem-ipsum.html`, `lorem-ipsum.js`)
+    - [x] Create Word Counter (`word-counter.html`, `word-counter.js`)
+    - [x] Create Color Picker (`color-picker.html`, `color-picker.js`)
+    - [x] Update `index.html` with new tools
+    - [x] Add detailed descriptive sections (How to Use, FAQ, etc.) to all new generator pages
+    - [x] Deploy updates to EC2
+- [x] **Deploy Generator Updates**: Deploy changes to EC2

@@ -1,6 +1,5 @@
-calculator/
-generator/
-saesal/
 .DS_Store
 node_modules/
 *.pem
+logs/
+.agent/
