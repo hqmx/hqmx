@@ -1,7 +1,9 @@
-# HQMX 프로젝트 통합 아키텍처 설계 문서 (단일 EC2)
+**HQMX 프로젝트 통합 아키텍처 설계 문서 (단일 EC2)**
 
-**최종 업데이트**: 2025-11-28
+**최종 업데이트**: 2025-12-05
 **작성자**: HQMX Development Team, Gemini Agent
+
+---
 
 ## 1. 결론 요약 (Executive Summary)
 
@@ -66,12 +68,12 @@ server {
     }
 
     # 각 서비스별 프론트엔드 라우팅
-    location /converter/ {
-        alias /var/www/hqmx/converter/;
+    location ^~ /converter/ {
+        alias /home/ubuntu/hqmx/services/converter/current/;
         try_files $uri $uri/ /converter/index.html;
     }
-    location /downloader/ {
-        alias /var/www/hqmx/downloader/;
+    location ^~ /downloader/ {
+        alias /home/ubuntu/hqmx/services/downloader/current/;
         try_files $uri $uri/ /downloader/index.html;
     }
     # ... (generator, calculator 등 추가)
@@ -238,9 +240,9 @@ location / {
 #### 해결 방법
 **Nginx 설정 재구성** (`/etc/nginx/sites-available/hqmx.net`):
 
-1. **API 프록시를 먼저 배치** (우선순위 확보)
-2. **서브 경로 명시적 정의**
-3. **메인 페이지는 마지막에** 배치
+1.  **API 프록시를 먼저 배치** (우선순위 확보)
+2.  **서브 경로 명시적 정의**
+3.  **메인 페이지는 마지막에** 배치
 
 ```nginx
 server {
@@ -302,14 +304,14 @@ $ curl -s -o /dev/null -w "%{http_code}\n" https://hqmx.net/downloader/
 
 ### 📚 교훈 및 예방 조치
 
-1. **타임존**: 
-   - ✅ 서버 측에서 타임스탬프 생성 (완전 해결)
-   - 🔒 향후 모든 배포 스크립트에 동일 원칙 적용
+1.  **타임존**: 
+    *   ✅ 서버 측에서 타임스탬프 생성 (완전 해결)
+    *   🔒 향후 모든 배포 스크립트에 동일 원칙 적용
 
-2. **Nginx 설정**:
-   - ✅ location 블록 순서 중요 (`^~` prefix로 우선순위 명확화)
-   - ✅ `try_files` 마지막 fallback은 신중하게 사용
-   - 🔒 설정 변경 시 항상 `nginx -t` 테스트
+2.  **Nginx 설정**: 
+    *   ✅ location 블록 순서 중요 (`^~` prefix로 우선순위 명확화)
+    *   ✅ `try_files` 마지막 fallback은 신중하게 사용
+    *   🔒 설정 변경 시 항상 `nginx -t` 테스트
 
 ### 🚨 [CRITICAL] 배포 후 500 에러 - Cleanup 스크립트 오작동
 
@@ -348,6 +350,7 @@ ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" "touch $RELEASE_DIR"
 - 배포 스크립트: `scripts/deploy-modular.sh`
 
 ---
+
 
 ### ✅ [RESOLVED] Converter 서비스 경로 문제 (배경, SW, API)
 
@@ -389,6 +392,7 @@ ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" "touch $RELEASE_DIR"
     - `frontend` 폴더만 배포되므로, 필요한 리소스(JSON, 문서 등)는 반드시 그 안에 위치해야 함.
 
 ---
+
 
 ### ✅ [RESOLVED] 네비게이션 링크 하드코딩 문제 (Converter, Calculator)
 
@@ -484,7 +488,7 @@ ssh -i "$SSH_KEY" "$EC2_USER@$EC2_HOST" "touch $RELEASE_DIR"
 # scripts/deploy-modular.sh
 # Use -E for extended regex to simplify syntax
 # Use # as delimiter to avoid conflict with | (alternation) in regex
-sed -E -i 's#\.(css|js)(\?v=[^"]*)?"#.\1?v='""'"#g' index.html
+sed -E -i 's#\.(css|js)(\?v=[^""]*)?"#.\1?v='"'"'"'"'#g' index.html
 ```
 
 #### 배포 및 검증
@@ -493,5 +497,291 @@ sed -E -i 's#\.(css|js)(\?v=[^"]*)?"#.\1?v='""'"#g' index.html
 - **Nginx**: 404/500 에러 해결됨.
 
 **참고**: `deploy-modular.sh`
+
+---
+### ✅ [RESOLVED] Nginx 루트 디렉토리 설정 오류 및 자막 변환 엔진 에러 (2025-12-03)
+
+**증상:**
+- `/converter/` 경로 접근 시 404 Not Found 오류 발생
+- Converter 페이지 로드 후, 자막 파일 변환 시 `Uncaught TypeError: window.SubtitleConverter.parseFcpxml is not a function` 에러 발생.
+
+**원인 분석:**
+- Nginx 설정(`/etc/nginx/sites-available/hqmx.net`)에서 `converter` 서비스의 `root` 경로가 `alias`로 되어 있지 않고 `root /var/www/hqmx;`로 되어 있어 `try_files`가 `/var/www/hqmx/converter/index.html`을 찾지 못함.
+- `converter/frontend/script.js`에 `initializeShowMoreButtons` 함수 내 `showMoreBtn.textContent = '+'`로 되어 있어, `index.html`의 Font Awesome `<i>` 태그와 불일치. (텍스트 대신 아이콘 클래스를 토글해야 함).
+- `converter/frontend/subtitle-converter.js`에서 FCPXML 변환 관련 함수가 `window.SubtitleConverter` 객체로 제대로 export되지 않아 `script.js`에서 호출할 수 없었음.
+- `converter/frontend/index.html`에서 `locales.js` 스크립트가 로드되지만, 실제로는 `i18n.js`에서 모든 언어 리소스가 관리되므로 중복 및 불필요.
+
+#### 해결 방법:
+1.  **Nginx 설정 수정**: `hqmx.net.nginx` 파일에서 `location ^~ /converter/` 블록에 `alias /home/ubuntu/hqmx/services/converter/current/` 추가.
+2.  **`converter/frontend/index.html`에서 중복된 `Subtitle` 카테고리 제거.**
+3.  **`converter/frontend/script.js`에 `Data` 카테고리 정의 추가 및 `FORMATS` 객체 업데이트.**
+4.  **`converter/frontend/script.js`에서 사용되지 않는 사이트맵 관련 코드 제거.**
+5.  **`converter/frontend/script.js`에서 `expand-formats-btn`의 아이콘 토글 로직 수정.**
+6.  **`converter/frontend/subtitle-converter.js` 수정**: `parseFcpxml`, `generateSrt` 함수를 `window.SubtitleConverter` 객체의 속성으로 명시적으로 export.
+7.  **`converter/frontend/index.html` 수정**: `<script src="/converter/locales.js"></script>` 라인 제거.
+
+**배포 내역:**
+```bash
+./deploy.sh converter
+```
+**상태**: ✅ 완료 (2025-12-05)
+
+---
+Finalizing Download Fixes.md
+# 다운로드 기능 최종 수정 사항
+
+**날짜**: 2025-11-27
+**작성자**: HQMX Development Team
+
+---
+
+
+## 1. 다운로더 서비스 배포 경로 수정
+
+### 문제점
+- `downloader` 서비스 배포 시 `/home/ubuntu/hqmx/services/downloader/current/frontend` 경로로 배포되어 Nginx가 파일을 찾지 못하는 문제 발생. Nginx 설정은 `/home/ubuntu/hqmx/services/downloader/current/`를 기대함.
+
+### 해결
+- `downloader/deploy.sh` 스크립트를 수정하여 `rsync` 명령에서 `/frontend` 하위 디렉토리를 제외하고 `downloader` 프로젝트의 루트 내용을 `/home/ubuntu/hqmx/services/downloader/current/`로 직접 동기화.
+
+### 변경 내용 (`downloader/deploy.sh`)
+```bash
+# Before:
+# rsync -avzh --delete --exclude 'node_modules' --exclude '.git' --exclude 'README.md' \
+#         "$SOURCE_DIR/" "$EC2_USER@$EC2_HOST:$REMOTE_BASE_DIR/$SERVICE_NAME/releases/$TIMESTAMP/"
+
+# After: (Changed to rsync content of frontend folder directly)
+rsync -avzh --delete --exclude 'node_modules' --exclude '.git' --exclude 'README.md' \
+        "$SOURCE_DIR/frontend/" "$EC2_USER@$EC2_HOST:$REMOTE_BASE_DIR/$SERVICE_NAME/releases/$TIMESTAMP/"
+```
+
+### 배포
+- `./deploy.sh downloader` 명령으로 `downloader` 서비스 재배포.
+
+---
+
+## 2. Nginx 설정 업데이트
+
+### 문제점
+- `downloader` 서비스의 `location` 블록에 `try_files $uri $uri/ /downloader/index.html;` 대신 `index index.html;`만 지정되어 있어 서브경로 접근 시 404 오류 발생.
+- `downloader` 서비스의 `root`가 `/var/www/hqmx/`로 잘못 설정되어 있었음.
+
+### 해결
+- Nginx 설정 파일 (`/etc/nginx/sites-available/hqmx.net`)에서 `downloader` 서비스의 `location` 블록을 수정.
+- `root` 지시어를 `alias`로 변경하여 `current` 심볼릭 링크를 따르도록 하고, `try_files`를 명시적으로 추가.
+
+### 변경 내용 (`hqmx.net.nginx`)
+```nginx
+# Before:
+# location /downloader/ {
+#     root /var/www/hqmx; # incorrect root for downloader
+#     index index.html;
+# }
+
+# After:
+location ^~ /downloader/ {
+    alias /home/ubuntu/hqmx/services/downloader/current/; # Correct alias to current
+    try_files $uri $uri/ /downloader/index.html;
+}
+```
+
+### 적용 명령
+```bash
+sudo mv /tmp/hqmx.net.nginx /etc/nginx/sites-available/hqmx.net
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+---
+
+
+## 3. `script.js` 내 CDN URL 하드코딩 제거 및 로컬 경로 사용
+
+### 문제점
+- `downloader/frontend/script.js`에 `batch-conversion-manager.js`의 CDN URL이 하드코딩되어 있어 `batchConversionManager` 로드 시 문제가 발생.
+- 현재 아키텍처는 모든 리소스를 단일 EC2 인스턴스에서 호스팅하므로 CDN URL 대신 로컬 상대 경로를 사용해야 함.
+
+### 해결
+- `script.js`에서 `batch-conversion-manager.js`의 CDN URL을 제거하고 로컬 상대 경로로 대체.
+
+### 변경 내용 (`downloader/frontend/script.js`)
+```javascript
+// Before:
+// const batchManagerScript = document.createElement('script');
+// batchManagerScript.src = 'https://cdn.example.com/batch-conversion-manager.js'; // Hardcoded CDN
+// document.body.appendChild(batchManagerScript);
+
+// After:
+// 로컬 파일 경로 사용
+const batchManagerScript = document.createElement('script');
+batchManagerScript.src = '/downloader/batch-conversion-manager.js';
+document.body.appendChild(batchManagerScript);
+```
+
+### 배포
+- `./deploy.sh downloader` 명령으로 `downloader` 서비스 재배포.
+
+---
+
+## 4. `downloader/frontend/index.html` CSS 경로 수정
+
+### 문제점
+- `downloader/frontend/index.html`의 CSS 파일 경로가 `/style.css`, `/batch-conversion-ui.css`와 같이 루트 절대 경로로 되어 있어 `/downloader/` 서브디렉토리 환경에서 404 오류 발생.
+
+### 해결
+- `downloader/frontend/index.html` 내의 모든 CSS 경로를 `downloader` 서비스의 서브디렉토리 경로에 맞게 상대 경로로 수정.
+
+### 변경 내용 (`downloader/frontend/index.html`)
+```html
+<!-- Before: -->
+<!-- <link rel="stylesheet" href="/style.css"> -->
+<!-- <link rel="stylesheet" href="/batch-conversion-ui.css"> -->
+
+<!-- After: -->
+<link rel="stylesheet" href="/downloader/style.css">
+<link rel="stylesheet" href="/downloader/batch-conversion-ui.css">
+```
+
+### 배포
+- `./deploy.sh downloader` 명령으로 `downloader` 서비스 재배포.
+
+---
+
+## 5. `dom.resultDisplay.classList.add('hide');` 문제 해결
+
+### 문제점
+- `downloader/frontend/script.js`에서 `dom.resultDisplay` 요소가 로드되지 않아 `TypeError: Cannot read properties of null (reading 'classList')` 에러 발생.
+
+### 해결
+- `script.js`의 `dom` 객체에 `resultDisplay` 요소를 추가하고, `index.html`에 `resultDisplay` ID를 가진 요소를 추가하여 스크립트가 DOM 요소를 올바르게 참조할 수 있도록 함.
+
+### 변경 내용 (`downloader/frontend/script.js`)
+```javascript
+// Before:
+// dom.resultDisplay.classList.add('hide'); // 에러 발생
+
+// After (dom 객체 정의에 추가):
+const dom = {
+    // ...
+    resultDisplay: document.getElementById('resultDisplay'),
+    // ...
+};
+
+// ... (사용 시 null 체크 또는 DOM 로드 후 실행 보장)
+if (dom.resultDisplay) {
+    dom.resultDisplay.classList.add('hide');
+}
+```
+
+### 변경 내용 (`downloader/frontend/index.html`)
+```html
+<!-- Added to index.html to ensure the element exists -->
+<div id="resultDisplay" class="result-display"></div>
+```
+
+### 배포
+- `./deploy.sh downloader` 명령으로 `downloader` 서비스 재배포.
+
+---
+
+
+## 6. `Error: Subtitle conversion engine not loaded.` 문제 해결
+
+### 문제점
+- `converter/frontend/script.js`에서 자막 변환 엔진 `window.SubtitleConverter`를 찾을 수 없어 변환 실패 에러 발생.
+
+### 해결
+- `converter/frontend/subtitle-converter.js`에서 `SubtitleConverter` 클래스의 인스턴스를 `window.SubtitleConverter`로 명시적으로 export 하여 `script.js`에서 접근 가능하도록 함.
+
+### 변경 내용 (`converter/frontend/subtitle-converter.js`)
+```javascript
+// Before:
+// class SubtitleConverter { ... }
+
+// After:
+class SubtitleConverter {
+    // ... 기존 코드 ...
+
+    // FCPXML 파서 및 SRT 생성기 함수도 외부에 노출
+    parseFcpxml(fcpxmlContent) { /* ... */ }
+    generateSrt(subtitles) { /* ... */ }
+    formatTime(seconds) { /* ... */ }
+}
+
+// 명시적으로 window 객체에 export
+window.SubtitleConverter = new SubtitleConverter();
+```
+
+### 배포
+- `./deploy.sh converter` 명령으로 `converter` 서비스 재배포.
+
+---
+
+## 7. `TypeError: window.SubtitleConverter.parseFcpxml is not a function` 문제 해결
+
+### 문제점
+- `window.SubtitleConverter` 객체는 존재하지만, 그 안에 `parseFcpxml` 함수가 포함되지 않아 에러 발생.
+
+### 해결
+- `converter/frontend/subtitle-converter.js`에서 `parseFcpxml`, `generateFcpxml`, `generateSrt` 함수를 `SubtitleConverter` 클래스의 멤버 함수로 명시적으로 추가하고, `window.SubtitleConverter`에 바인딩하여 외부에서 호출 가능하도록 함.
+
+### 변경 내용 (`converter/frontend/subtitle-converter.js`)
+```javascript
+// SubtitleConverter 클래스 내부에 다음 함수들을 추가:
+class SubtitleConverter {
+    // ... (기존 코드)
+
+    parseFcpxml(fcpxmlContent) {
+        // FCPXML 파싱 로직
+    }
+
+    generateFcpxml(subtitles) {
+        // FCPXML 생성 로직
+    }
+
+    generateSrt(subtitles) {
+        // SRT 생성 로직
+    }
+
+    formatTime(seconds) {
+        // 시간 포맷팅 로직
+    }
+}
+// window.SubtitleConverter = new SubtitleConverter(); (이 부분은 기존과 동일)
+```
+
+### 배포
+- `./deploy.sh converter` 명령으로 `converter` 서비스 재배포.
+
+---
+
+
+## 8. `index.html` 및 `script.js`의 UI/UX 불일치 및 연결되지 않은 요소 처리
+
+**발생 날짜**: 2025-12-05
+**해결 날짜**: 2025-12-05
+**심각도**: MEDIUM (사용자 경험 저하 및 기능 불완전)
+
+#### 증상
+1.  **`index.html`의 중복 `Subtitle` 카테고리:** "Supported Formats Section"에 `Subtitle` 카테고리 그룹이 두 번 나열되어 불필요한 중복 발생.
+2.  **`Data` 카테고리 불일치:** `index.html`에는 `Data` 카테고리가 정의되어 있지만, `script.js`의 `FORMATS` 객체에 `data` 카테고리가 정의되어 있지 않아 형식 인식이 안 됨.
+3.  **`script.js`의 불필요한 사이트맵 관련 코드:** `script.js`에 `sitemapExpandBtn` 관련 DOM 참조 및 이벤트 리스너 로직이 포함되어 있지만, `index.html`에는 해당 섹션이 없어 불필요.
+4.  **`expand-formats-btn` 아이콘 토글 로직 불일치:** `script.js`는 `showMoreBtn.textContent`를 변경하여 `+`/`×` 텍스트를 토글하지만, `index.html`은 Font Awesome `<i>` 태그를 사용하여 아이콘을 표시하므로 아이콘 클래스를 토글해야 함.
+
+#### 해결 방법
+
+1.  **`converter/frontend/index.html` 수정**: "Supported Formats Section" 내의 중복된 `Subtitle` 카테고리 (두 번째 `<div class="format-group">...</div>` 블록)를 제거.
+2.  **`converter/frontend/script.js` 수정**:
+    *   `FORMATS` 객체에 `data` 카테고리(`xlsx`, `csv`, `json`, `xml`, `xls`, `tsv`, `ods`, `sql`, `numbers` 형식 포함)를 추가하고, `document` 카테고리에서 `xlsx`, `xls`를 제거.
+    *   `CROSS_CATEGORY_COMPATIBILITY` 객체에 `data` 카테고리 호환성 규칙 (`data`를 `document`로 변환 가능, `sourceFormats` 및 `targetFormats` 정의)을 추가.
+    *   `ADVANCED_SETTINGS` 객체에 `data` 카테고리의 고급 설정(`quality`)을 추가.
+    *   `sitemapExpandBtn` 및 `categoryIconBtns` 변수 선언, `if (sitemapExpandBtn)` 블록, `categoryIconBtns.forEach` 블록 등 불필요한 사이트맵 관련 코드 제거.
+    *   `initializeShowMoreButtons` 함수를 수정하여 `showMoreBtn.textContent` 대신 `showMoreBtn.innerHTML`을 사용하여 Font Awesome `<i>` 태그의 `fas fa-plus` 및 `fas fa-times` (또는 `fas fa-minus`) 클래스를 토글하도록 변경.
+
+#### 배포 내역
+```bash
+./deploy.sh converter
+```
+**상태**: ✅ 완료 (2025-12-05)
 
 ---

@@ -14,43 +14,63 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    # Root maps to Main service (deployed via deploy-modular.sh)
+    charset utf-8;
+
+    # This root is the default for requests not caught by specific locations
     root /home/ubuntu/hqmx/services/main/current;
     index index.html;
 
-    # Main Page
+    # Main Page (root)
     location / {
-        try_files $uri $uri/ /index.html;
+        try_files $uri $uri/index.html =404; # Serve index.html from main, or 404
     }
 
-    # Handle /main/ prefix used in index.html assets
+    # Main service assets
     location ^~ /main/ {
-        alias /home/ubuntu/hqmx/services/main/current/;
+        root /home/ubuntu/hqmx/services/main/current;
+        index index.html;
+        rewrite ^/main/(.*)$ /$1 break;
+        try_files $uri $uri/index.html =404;
     }
 
-    # Converter
+    # Converter service
     location ^~ /converter/ {
-        alias /home/ubuntu/hqmx/services/converter/current/;
-        try_files $uri $uri/ /converter/index.html;
+        root /home/ubuntu/hqmx/services/converter/current;
+        index index.html;
+        rewrite ^/converter/(.*)$ /$1 break;
+        default_type text/html; # Added to force serving as HTML
+        try_files $uri $uri/index.html =404;
     }
 
-    # Downloader
+    # Downloader service
     location ^~ /downloader/ {
-        alias /home/ubuntu/hqmx/services/downloader/current/;
-        try_files $uri $uri.html $uri/ /downloader/index.html;
+        root /home/ubuntu/hqmx/services/downloader/current;
+        index index.html;
+        rewrite ^/downloader/(.*)$ /$1 break;
+        try_files $uri $uri/index.html =404;
     }
 
-    # Generator
+    # Generator service
     location ^~ /generator/ {
-        alias /home/ubuntu/hqmx/services/generator/current/;
-        try_files $uri $uri/ /generator/index.html;
+        root /home/ubuntu/hqmx/services/generator/current;
+        index index.html;
+        rewrite ^/generator/(.*)$ /$1 break;
+        try_files $uri $uri/index.html =404;
     }
 
-    # Calculator
+    # Calculator service
     location ^~ /calculator/ {
-        alias /home/ubuntu/hqmx/services/calculator/current/;
-        try_files $uri $uri/ /calculator/index.html;
+        root /home/ubuntu/hqmx/services/calculator/current;
+        index index.html;
+        rewrite ^/calculator/(.*)$ /$1 break;
+        try_files $uri $uri/index.html =404;
     }
+
+
+
+
+
+
 
     # API Proxy (Converter)
     location /api/converter/ {
