@@ -1,94 +1,61 @@
 server {
     listen 80;
-    server_name hqmx.net www.hqmx.net;
-    return 301 https://$host$request_uri;
-}
-
-server {
     listen 443 ssl;
     server_name hqmx.net www.hqmx.net;
-
-    # SSL Configuration
-    ssl_certificate /etc/letsencrypt/live/hqmx.net/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/hqmx.net/privkey.pem;
-    include /etc/letsencrypt/options-ssl-nginx.conf;
-    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
-
-    charset utf-8;
-
-    # This root is the default for requests not caught by specific locations
+    
     root /home/ubuntu/hqmx/services/main/current;
     index index.html;
 
-    # Main Page (root)
-    location / {
-        try_files $uri $uri/index.html =404; # Serve index.html from main, or 404
-    }
-
-    # Main service assets
-    location ^~ /main/ {
-        root /home/ubuntu/hqmx/services/main/current;
-        index index.html;
-        rewrite ^/main/(.*)$ /$1 break;
-        try_files $uri $uri/index.html =404;
-    }
-
-    # Converter service
-    location ^~ /converter/ {
-        root /home/ubuntu/hqmx/services/converter/current;
-        index index.html;
-        rewrite ^/converter/(.*)$ /$1 break;
-        default_type text/html; # Added to force serving as HTML
-        try_files $uri $uri/index.html =404;
-    }
-
-    # Downloader service
-    location ^~ /downloader/ {
-        root /home/ubuntu/hqmx/services/downloader/current;
-        index index.html;
-        rewrite ^/downloader/(.*)$ /$1 break;
-        try_files $uri $uri/index.html =404;
-    }
-
-    # Generator service
-    location ^~ /generator/ {
-        root /home/ubuntu/hqmx/services/generator/current;
-        index index.html;
-        rewrite ^/generator/(.*)$ /$1 break;
-        try_files $uri $uri/index.html =404;
-    }
-
-    # Calculator service
-    location ^~ /calculator/ {
-        root /home/ubuntu/hqmx/services/calculator/current;
-        index index.html;
-        rewrite ^/calculator/(.*)$ /$1 break;
-        try_files $uri $uri/index.html =404;
-    }
-
-
-
-
-
-
-
-    # API Proxy (Converter)
-    location /api/converter/ {
+    # ✅ 1. API 프록시 먼저 (^~ 사용으로 우선순위 확보)
+    location ^~ /api/converter/ {
         proxy_pass http://localhost:3001/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # API Proxy (Downloader)
-    location /api/downloader/ {
+    location ^~ /api/downloader/ {
         proxy_pass http://localhost:5000/api/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Common Assets Caching
+    # ✅ 2. 서브 경로 명시적 정의
+    location ^~ /converter/ {
+        alias /home/ubuntu/hqmx/services/converter/current/;
+        try_files $uri $uri/index.html;
+    }
+
+    location ^~ /downloader/ {
+        alias /home/ubuntu/hqmx/services/downloader/current/;
+        try_files $uri $uri/index.html;
+    }
+
+    location ^~ /generator/ {
+        alias /home/ubuntu/hqmx/services/generator/current/;
+        try_files $uri $uri/index.html;
+    }
+
+    location ^~ /calculator/ {
+        alias /home/ubuntu/hqmx/services/calculator/current/;
+        try_files $uri $uri/index.html;
+    }
+
+    # ✅ 3. 메인 페이지는 마지막에 (fallback 없이)
+    location / {
+        try_files $uri $uri/index.html =404;
+    }
+
+    # CORS 설정 (별도로 추가)
+    add_header 'Access-Control-Allow-Origin' 'https://hqmx.net' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+    add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range' always;
+    add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range' always;
+
+    # Common Assets Caching (별도로 추가)
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";

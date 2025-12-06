@@ -1,0 +1,44 @@
+server {
+    listen 80;
+    server_name api.hqmx.net;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    server_name api.hqmx.net;
+
+    ssl_certificate /etc/letsencrypt/live/api.hqmx.net/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.hqmx.net/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    add_header 'Access-Control-Allow-Origin' '*' always;
+    add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
+    add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range' always;
+    add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range' always;
+
+    if ($request_method = 'OPTIONS') {
+        return 204;
+    }
+
+    location /downloader/ {
+        proxy_pass http://localhost:5000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /converter/ {
+        proxy_pass http://localhost:3001/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        return 404;
+    }
+}

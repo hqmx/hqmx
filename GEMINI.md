@@ -623,6 +623,73 @@ document.body.appendChild(batchManagerScript);
 
 ---
 
+## 4. 메인 페이지 사이트맵 확장 버튼 미동작 해결
+
+**발생 날짜**: 2025-12-05
+**해결 날짜**: 2025-12-05
+**심각도**: MEDIUM (기능 불완전)
+
+### 증상
+- `hqmx.net` 메인 페이지 하단의 사이트맵에서 각 서비스(Converter, Downloader, Generator, Calculator) 옆의 `+` 버튼을 클릭해도 하위 메뉴가 펼쳐지지 않음.
+
+### 원인
+- `main/frontend/script.js` 파일에 해당 버튼(`converterExpandBtn`, `downloaderExpandBtn` 등)에 대한 이벤트 리스너 로직이 누락되어 있었음.
+
+### 해결
+- `main/frontend/script.js`에 각 버튼에 대한 클릭 이벤트 리스너를 추가하여, 클릭 시 해당 서비스의 하위 메뉴(아이콘 네비게이션)가 표시되도록 구현 (`show` 클래스 토글).
+- 버튼 클릭 시 아이콘이 `+`에서 `×`로 변경되도록 UI 피드백 추가.
+
+### 변경 내용 (`main/frontend/script.js`)
+```javascript
+// 사이트맵 확장 버튼 로직 추가
+const expandBtns = {
+    converter: document.getElementById('converterExpandBtn'),
+    downloader: document.getElementById('downloaderExpandBtn'),
+    generator: document.getElementById('generatorExpandBtn'),
+    calculator: document.getElementById('calculatorExpandBtn')
+};
+
+const navSections = {
+    converter: document.querySelector('.category-icons-nav'),
+    downloader: document.querySelector('.platform-icons-nav'),
+    generator: document.querySelector('.generator-links-nav'),
+    calculator: document.querySelector('.calculator-links-nav')
+};
+
+// 각 버튼에 이벤트 리스너 연결
+Object.keys(expandBtns).forEach(key => {
+    const btn = expandBtns[key];
+    const nav = navSections[key];
+    
+    if (btn && nav) {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 이벤트 버블링 방지
+            
+            // 다른 열린 메뉴 닫기 (선택 사항 - 여기서는 모두 독립적으로 동작하게 함)
+            // ...
+
+            // 메뉴 토글
+            nav.classList.toggle('show');
+            
+            // 아이콘 토글
+            const icon = btn.querySelector('i');
+            if (nav.classList.contains('show')) {
+                icon.classList.remove('fa-plus');
+                icon.classList.add('fa-times');
+            } else {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-plus');
+            }
+        });
+    }
+});
+```
+
+### 배포
+- `./deploy.sh main` 명령으로 `main` 서비스 재배포.
+
+---
+
 ## 4. `downloader/frontend/index.html` CSS 경로 수정
 
 ### 문제점

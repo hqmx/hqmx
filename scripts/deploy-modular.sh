@@ -17,15 +17,21 @@ SSH_KEY="$PROJECT_ROOT/hqmx-ec2.pem"
 
 # Parse Arguments
 SERVICE=""
-ENV="dev" # Default to dev for safety
+_ENV="dev" # Temporary variable for parsing
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --service=*) SERVICE="${1#*=}"; shift ;;
-        --env=*) ENV="${1#*=}"; shift ;;
+        --env=*) _ENV="${1#*=}"; shift ;; # Assign to temporary variable
         *) echo "Unknown parameter passed: $1"; exit 1 ;;
     esac
 done
+
+ENV="$_ENV" # Assign to global ENV variable
+
+# Remove debug line
+
+
 
 if [ -z "$SERVICE" ]; then
     echo "❌ Error: Service name is required. Use --service=<name>"
