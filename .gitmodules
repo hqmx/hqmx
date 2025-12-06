@@ -10,3 +10,15 @@
 [submodule "hannah-design"]
 	path = hannah-design
 	url = https://github.com/hqmx/hannah-design.git
+[submodule "converter"]
+        path = converter
+        url = https://github.com/hqmx/converter.git
+[submodule "downloader"]
+        path = downloader
+        url = https://github.com/hqmx/downloader.git
+[submodule "main"]
+        path = main
+        url = https://github.com/hqmx/main.git
+[submodule "soluna"]
+        path = soluna
+        url = https://github.com/hqmx/soluna.git
