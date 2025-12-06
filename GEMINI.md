@@ -549,6 +549,31 @@ sed -E -i 's#\.(css|js)(\?v=[^""]*)?"#.\1?v='"'"'"'"'#g' index.html
 **상태**: ✅ 완료 (2025-12-05)
 
 ---
+
+## 9. Git Infinite Loop & Massive Untracked Files (Downloader Backend)
+
+**Occurrence Date**: 2025-12-06
+**Severity**: CRITICAL (IDE Hang, CPU/Memory Usage)
+
+### Symptoms
+- VS Code internal git process consuming high CPU.
+- Git status showing "4000+" pending changes.
+- Repeated `git status`, `git fetch`, `git for-each-ref` log entries.
+- Presence of `.d` (dependency) files being re-uploaded or tracked.
+
+### Root Cause
+- The `downloader/backend/venv` directory (Python virtual environment) was NOT ignored in `downloader/.gitignore`.
+- This caused thousands of library files and build artifacts (`*.d`, `*.pyc`, etc.) to be tracked by git.
+- The parent repository `hqmx` constantly detected "untracked content" in the submodule, causing a feedback loop.
+
+### Resolution
+1.  **Update `.gitignore`**: Added `venv/`, `.venv/`, `__pycache__/`, `*.d` to `downloader/.gitignore`.
+2.  **Clear Git Index**: Executed `git rm -r --cached backend/venv` to remove already tracked files from the index without deleting them physically.
+3.  **Commit & Sync**: Committed the ignores in `downloader` and updated the submodule pointer in `hqmx`.
+
+### Action Items for Future
+- Always verify `.gitignore` when setting up new Python projects (ensure `venv` is excluded).
+- Use `git status` inside submodules to verify clean state before assuming the root repo is broken.
 Finalizing Download Fixes.md
 # 다운로드 기능 최종 수정 사항
 

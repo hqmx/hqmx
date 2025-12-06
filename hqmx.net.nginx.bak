@@ -2,14 +2,11 @@ server {
     listen 80;
     listen 443 ssl;
     server_name hqmx.net www.hqmx.net;
-
-    ssl_certificate /etc/letsencrypt/live/hqmx.net/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/hqmx.net/privkey.pem;
     
     root /home/ubuntu/hqmx/services/main/current;
     index index.html;
 
-    # API and existing services
+    # ✅ 1. API 프록시 먼저 (^~ 사용으로 우선순위 확보)
     location ^~ /api/converter/ {
         proxy_pass http://localhost:3001/api/;
         proxy_set_header Host $host;
@@ -26,6 +23,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # ✅ 2. 서브 경로 명시적 정의
     location ^~ /converter/ {
         alias /home/ubuntu/hqmx/services/converter/current/;
         try_files $uri $uri/index.html;
@@ -46,43 +44,18 @@ server {
         try_files $uri $uri/index.html;
     }
 
-    # New Next.js services
-    location /soluna {
-        proxy_pass http://localhost:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location /saesal/ {
-        proxy_pass http://localhost:3004/;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location /hannah-design {
-        proxy_pass http://localhost:3002;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # Main page
+    # ✅ 3. 메인 페이지는 마지막에 (fallback 없이)
     location / {
         try_files $uri $uri/index.html =404;
     }
 
-    # CORS settings
+    # CORS 설정 (별도로 추가)
     add_header 'Access-Control-Allow-Origin' 'https://hqmx.net' always;
     add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS' always;
     add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range' always;
     add_header 'Access-Control-Expose-Headers' 'Content-Length,Content-Range' always;
 
-    # Caching for static assets
+    # Common Assets Caching (별도로 추가)
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
